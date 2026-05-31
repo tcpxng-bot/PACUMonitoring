@@ -1,0 +1,2228 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>PACU Ready AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Inline CSS from styles.html -->
+  <style>
+:root{
+  --bg:#F0F4FA;--bg-card:#FFF;--text:#1C1C1E;--text-2:#3C3C43;--text-3:#8E8E93;
+  --sep:rgba(60,60,67,.1);--sep-d:rgba(60,60,67,.2);
+  --navy:#0F2D5E;--navy-2:#1A4080;--navy-bg:#EBF2FF;
+  --blue:#3A7BD5;--blue-bg:#EBF4FF;
+  --green:#2EBD6B;--green-bg:#E5FFF1;
+  --orange:#FF9500;--orange-bg:#FFF4E0;
+  --red:#FF3B30;--red-bg:#FFECEB;
+  --purple:#7B5EA7;--teal:#32ADE6;
+  --font:'IBM Plex Sans Thai',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --nav-h:58px;--hdr-h:62px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0A0F1A;--bg-card:#111827;--text:#F0F4FF;--text-2:#C0CCDE;--text-3:#6B7A99;
+  --sep:rgba(100,120,180,.18);--sep-d:rgba(100,120,180,.32);
+  --navy:#1E3A6E;--navy-2:#2A5098;--navy-bg:rgba(58,123,213,.15);
+  --blue-bg:rgba(58,123,213,.18);--green-bg:rgba(46,189,107,.12);
+  --orange-bg:rgba(255,149,0,.12);--red-bg:rgba(255,59,48,.12);
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100dvh;}
+.app-wrap{padding-top:var(--hdr-h);padding-bottom:calc(var(--nav-h)+env(safe-area-inset-bottom));}
+
+/* ── HEADER ── */
+.app-header{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--hdr-h);
+  background:var(--navy);display:flex;align-items:flex-end;padding:0 16px 10px;}
+.hdr-row{display:flex;align-items:center;width:100%;}
+.brand{display:flex;align-items:center;gap:10px;flex:1;}
+.brand-icon{width:36px;height:36px;background:rgba(255,255,255,.1);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-icon svg{width:24px;height:24px;}
+.brand-texts h1{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.2px;line-height:1.2;}
+.brand-texts small{font-size:9px;color:rgba(255,255,255,.5);}
+.ai-pill{font-size:10px;font-weight:700;background:var(--blue);color:#fff;padding:2px 7px;border-radius:10px;margin-left:5px;}
+.hdr-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);color:#fff;
+  font-family:var(--font);font-size:12px;font-weight:600;border:none;border-radius:20px;
+  padding:7px 13px;cursor:pointer;transition:opacity .15s;}
+.hdr-btn:active{opacity:.7;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(240,244,250,.96);backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);border-top:.5px solid var(--sep);
+  display:flex;align-items:center;padding-bottom:env(safe-area-inset-bottom);z-index:300;}
+@media(prefers-color-scheme:dark){.bottom-nav{background:rgba(10,15,26,.94);}}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:0 2px;cursor:pointer;border:none;background:transparent;
+  font-family:var(--font);color:var(--text-3);transition:transform .1s;}
+.nav-tab:active{transform:scale(.88);}
+.nav-tab.active{color:var(--blue);}
+.nav-tab svg{width:22px;height:22px;stroke-width:1.7;}
+.nav-tab span{font-size:9px;font-weight:500;}
+
+/* ── PAGES ── */
+.tab-page{display:none;padding-bottom:20px;}
+.tab-page.active{display:block;}
+.page-title{font-size:20px;font-weight:700;padding:14px 16px 6px;letter-spacing:-.3px;}
+.page-sub{font-size:13px;color:var(--text-3);padding:0 16px 10px;line-height:1.5;}
+.section-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-3);padding:12px 16px 4px;display:flex;align-items:center;gap:6px;}
+
+/* ── METRICS ── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px;margin-bottom:10px;}
+.metric-box{background:var(--bg-card);border-radius:12px;border:.5px solid var(--sep);padding:10px 4px;text-align:center;}
+.m-num{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1;margin-bottom:2px;}
+.m-num.blue{color:var(--blue);}.m-num.green{color:var(--green);}.m-num.orange{color:var(--orange);}.m-num.red{color:var(--red);}
+.m-lbl{font-size:9px;color:var(--text-3);font-weight:500;}
+
+/* ── PATIENT CARDS ── */
+.pt-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.pt-card{background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);cursor:pointer;transition:transform .1s;}
+.pt-card:active{transform:scale(.98);}
+.pt-inner{padding:12px 14px;}
+.pt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.pt-name{font-size:15px;font-weight:600;}
+.pt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;}
+.pt-badge.ready{background:var(--green-bg);color:#166534;}
+.pt-badge.observe{background:var(--orange-bg);color:#7A4500;}
+.pt-badge.alert{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.pt-badge.ready{color:var(--green);}.pt-badge.observe{color:var(--orange);}.pt-badge.alert{color:var(--red);}}
+.pt-hn{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-bottom:1px;}
+.pt-op{font-size:12px;color:var(--text-2);}
+.pt-pills{display:flex;gap:5px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--sep);}
+.pt-pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--text-3);}
+.pt-pill.good{background:var(--green-bg);color:#166534;}
+@media(prefers-color-scheme:dark){.pt-pill.good{color:var(--green);}}
+
+/* ── STATUS STRIP ── */
+.status-strip{margin:10px 16px;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;border:.5px solid transparent;transition:all .3s;}
+.status-strip.ready{background:var(--green-bg);border-color:rgba(46,189,107,.3);}
+.status-strip.observe{background:var(--orange-bg);border-color:rgba(255,149,0,.3);}
+.status-strip.alert{background:var(--red-bg);border-color:rgba(255,59,48,.3);}
+.ss-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.ss-score{font-family:var(--mono);font-size:28px;font-weight:600;line-height:1;}
+.ss-scoremax{font-size:10px;color:var(--text-3);font-family:var(--mono);}
+.status-strip.ready .ss-score{color:var(--green);}
+.status-strip.observe .ss-score{color:var(--orange);}
+.status-strip.alert .ss-score{color:var(--red);}
+.ss-div{width:.5px;height:36px;background:var(--sep-d);flex-shrink:0;}
+.ss-info{flex:1;min-width:0;}
+.ss-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.status-strip.ready .ss-badge{color:var(--green);}
+.status-strip.observe .ss-badge{color:var(--orange);}
+.status-strip.alert .ss-badge{color:var(--red);}
+.ss-title{font-size:13px;font-weight:600;line-height:1.3;}
+.ss-desc{font-size:11px;color:var(--text-2);}
+.ss-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.ss-sub{display:flex;align-items:center;gap:4px;}
+.ss-sub-lbl{font-size:10px;color:var(--text-3);}
+.ss-sub-val{font-family:var(--mono);font-size:12px;font-weight:600;}
+.timer-pill{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px;
+  background:rgba(15,45,94,.08);color:var(--navy);}
+@media(prefers-color-scheme:dark){.timer-pill{background:rgba(255,255,255,.08);color:var(--text-2);}}
+.timer-pill.mid{color:var(--orange);}.timer-pill.lng{color:var(--red);}
+
+/* ── ALERTS ── */
+.alert-list{margin:0 16px 6px;display:flex;flex-direction:column;gap:5px;}
+.alert-chip{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:500;line-height:1.45;}
+.alert-chip.warn{background:var(--orange-bg);color:#7A4500;}
+.alert-chip.danger{background:var(--red-bg);color:#8B1A1A;}
+.alert-chip.info{background:var(--blue-bg);color:#1A4080;}
+@media(prefers-color-scheme:dark){.alert-chip.warn{color:#FFA040;}.alert-chip.danger{color:#FF7070;}.alert-chip.info{color:#7AADFF;}}
+.alert-ico{flex-shrink:0;margin-top:1px;}
+.alert-body{flex:1;}
+.alert-title{font-weight:700;margin-bottom:1px;}
+.alert-action{font-size:11px;opacity:.8;margin-top:2px;}
+.next-wrap{padding:0 16px 6px;display:flex;align-items:center;gap:8px;}
+.next-badge{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+.countdown{font-family:var(--mono);font-weight:700;}
+
+/* ── TYPE TOGGLE ── */
+.type-bar{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.type-btn{flex:1;font-family:var(--font);font-size:12px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .2s;}
+.type-btn.active{background:var(--navy);color:#fff;}
+
+/* ── OP TYPE TOGGLE ── */
+.op-bar{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.op-btn{flex:1;font-family:var(--font);font-size:11px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:7px 4px;cursor:pointer;transition:all .2s;}
+.op-btn.active{background:var(--blue);color:#fff;}
+
+/* ── SUB-TABS ── */
+.sub-nav{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.sub-tab{flex:1;font-family:var(--font);font-size:10.5px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:7px 2px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.sub-tab.active{background:var(--navy);color:#fff;}
+.sub-panel{display:none;}
+.sub-panel.active{display:block;}
+
+/* ── CARDS / FORM ── */
+.card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.form-row{display:flex;align-items:center;padding:11px 15px;border-top:.5px solid var(--sep);min-height:46px;}
+.form-row:first-child{border-top:none;}
+.row-lbl{font-size:14px;color:var(--text);flex:0 0 110px;}
+.row-inp{flex:1;font-family:var(--font);font-size:14px;color:var(--text);background:transparent;border:none;outline:none;text-align:right;min-height:40px;padding:0 0 0 8px;}
+.row-inp::placeholder{color:var(--text-3);}
+select.row-inp{appearance:none;cursor:pointer;}
+
+/* ── SPINAL BOX ── */
+.spinal-box{margin:0 16px 10px;background:var(--navy-bg);border-radius:14px;padding:12px 14px;border:.5px solid rgba(58,123,213,.2);}
+.spinal-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+@media(prefers-color-scheme:dark){.spinal-title{color:#7AADFF;}}
+.spinal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-top:.5px solid rgba(58,123,213,.1);}
+.spinal-row:first-of-type{border-top:none;}
+.spinal-key{font-size:12px;color:var(--text-2);}
+.spinal-val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--blue);text-align:right;max-width:60%;}
+
+/* ── TIMELINE ── */
+.tl-wrap{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tl-table{width:100%;border-collapse:collapse;min-width:540px;}
+.tl-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:rgba(255,255,255,.75);padding:8px 8px;background:var(--navy);text-align:center;white-space:nowrap;}
+.tl-table th:first-child{text-align:left;position:sticky;left:0;z-index:2;background:var(--navy);color:#fff;padding-left:12px;}
+.tl-table td{font-family:var(--mono);font-size:12px;padding:7px 6px;border-bottom:.5px solid var(--sep);text-align:center;vertical-align:middle;}
+.tl-table tr:last-child td{border-bottom:none;}
+.tl-table td:first-child{font-family:var(--font);font-size:12px;font-weight:600;text-align:left;
+  position:sticky;left:0;background:var(--bg-card);z-index:1;color:var(--navy);padding:7px 6px 7px 12px;white-space:nowrap;}
+.tl-row-cur td{background:rgba(58,123,213,.05);}
+.tl-row-cur td:first-child{background:rgba(58,123,213,.07);}
+.tl-inp{font-family:var(--mono);font-size:12px;background:transparent;border:none;outline:none;width:44px;text-align:center;color:var(--text);padding:2px;}
+.tl-inp.ok{color:var(--green);font-weight:600;}.tl-inp.warn{color:var(--orange);font-weight:600;}.tl-inp.danger{color:var(--red);font-weight:700;}
+.ald-cell{font-family:var(--mono);font-size:12px;font-weight:700;width:28px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;}
+.ald-cell.good{background:var(--green-bg);color:#166534;}
+.ald-cell.warn{background:var(--orange-bg);color:#7A4500;}
+.ald-cell.danger{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.ald-cell.good{color:var(--green);}.ald-cell.warn{color:var(--orange);}.ald-cell.danger{color:var(--red);}}
+.ald-cell.pending{background:var(--navy-bg);color:var(--blue);}
+.tl-now-tag{font-size:9px;color:var(--blue);font-weight:700;display:block;}
+.tl-time{font-size:13px;}
+
+/* Aldrete sub-rows inside timeline */
+.ald-sub-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--navy-bg);border-top:.5px solid rgba(58,123,213,.2);}
+.ald-sub-label{font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+@media(prefers-color-scheme:dark){.ald-sub-label{color:#7AADFF;}}
+.ald-opts{display:flex;flex-direction:column;gap:10px;padding:8px 12px 12px;}
+.ald-crit{}
+.ald-crit-lbl{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ald-auto{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 6px;border-radius:10px;}
+.ald-crit-opts{display:flex;flex-direction:column;gap:4px;}
+.ald-full-btn{font-family:var(--font);font-size:12px;text-align:left;padding:8px 11px;border-radius:9px;border:1.5px solid var(--sep-d);background:var(--bg);color:var(--text-2);cursor:pointer;line-height:1.35;transition:all .12s;}
+.ald-full-btn.sel{background:var(--navy-bg);color:var(--navy);border-color:var(--navy);font-weight:600;}
+@media(prefers-color-scheme:dark){.ald-full-btn.sel{color:#7AADFF;}}
+
+/* ── SCORE ACCORDION ── */
+.score-wrap{margin:0 16px 8px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.score-hdr-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border:none;background:transparent;cursor:pointer;font-family:var(--font);}
+.score-hdr-left{text-align:left;}
+.score-hdr-left h3{font-size:15px;font-weight:600;color:var(--text);}
+.score-hdr-left p{font-size:11px;color:var(--text-3);margin-top:1px;}
+.score-hdr-right{display:flex;align-items:center;gap:8px;}
+.score-total{font-family:var(--mono);font-size:26px;font-weight:600;}
+.score-total.good{color:var(--green);}.score-total.warn{color:var(--orange);}.score-total.danger{color:var(--red);}
+.score-chevron{width:18px;height:18px;color:var(--text-3);transition:transform .25s;flex-shrink:0;}
+.score-wrap.open .score-chevron{transform:rotate(180deg);}
+.score-body{display:none;border-top:.5px solid var(--sep);}
+.score-wrap.open .score-body{display:block;}
+.score-bar-wrap{padding:4px 16px 10px;}
+.score-bar{height:4px;background:var(--bg);border-radius:99px;overflow:hidden;margin:6px 0 4px;}
+.score-fill{height:100%;border-radius:99px;transition:width .4s,background .3s;}
+.score-fill.good{background:var(--green);}.score-fill.warn{background:var(--orange);}.score-fill.danger{background:var(--red);}
+.score-status-lbl{font-size:11px;font-weight:600;}
+.score-status-lbl.good{color:var(--green);}.score-status-lbl.warn{color:var(--orange);}.score-status-lbl.danger{color:var(--red);}
+.criteria{border-top:.5px solid var(--sep);}
+.crit-item{padding:10px 16px;border-bottom:.5px solid var(--sep);}
+.crit-item:last-child{border-bottom:none;}
+.crit-lbl{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.auto-tag{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 6px;border-radius:10px;}
+.crit-opts{display:flex;flex-direction:column;gap:4px;}
+.crit-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:var(--bg);border:1.5px solid transparent;cursor:pointer;font-size:12px;color:var(--text-2);transition:all .12s;}
+.crit-opt input{display:none;}
+.radio-ring{width:18px;height:18px;border-radius:50%;border:2px solid var(--sep-d);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.crit-opt.sel{border-color:var(--navy);background:var(--navy-bg);color:var(--navy);font-weight:500;}
+.crit-opt.sel .radio-ring{border-color:var(--navy);background:var(--navy);}
+.crit-opt.sel .radio-ring::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;}
+
+/* ── DRUGS ── */
+.drug-entry{margin:0 16px 8px;background:var(--bg-card);border-radius:14px;border:.5px solid var(--sep);overflow:hidden;}
+.drug-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--bg);border-bottom:.5px solid var(--sep);}
+.drug-select{font-family:var(--font);font-size:14px;font-weight:600;background:transparent;border:none;outline:none;color:var(--text);flex:1;cursor:pointer;appearance:none;}
+.drug-del{background:var(--red-bg);border:none;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;}
+.drug-body{display:grid;grid-template-columns:1fr 1fr;}
+.drug-field{padding:9px 14px;border-right:.5px solid var(--sep);border-bottom:.5px solid var(--sep);}
+.drug-field:nth-child(2n){border-right:none;}
+.drug-field:nth-last-child(-n+2){border-bottom:none;}
+.drug-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);margin-bottom:3px;}
+.drug-field input{font-family:var(--mono);font-size:14px;font-weight:500;background:transparent;border:none;outline:none;color:var(--text);width:100%;}
+.drug-monitor-box{margin:0 16px 10px;background:var(--orange-bg);border-radius:12px;padding:11px 14px;border:.5px solid rgba(255,149,0,.25);}
+.drug-monitor-title{font-size:10px;font-weight:700;color:#7A4500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+@media(prefers-color-scheme:dark){.drug-monitor-title{color:#FFA040;}}
+.drug-monitor-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-top:.5px solid rgba(255,149,0,.15);}
+.drug-monitor-item:first-of-type{border-top:none;}
+.drug-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:4px;}
+
+/* ── CHECKS ── */
+.checks-grid{display:grid;grid-template-columns:1fr 1fr;}
+.check-cell{display:flex;align-items:center;gap:7px;padding:11px 14px;border-right:.5px solid var(--sep);border-bottom:.5px solid var(--sep);cursor:pointer;font-size:13px;color:var(--text-2);}
+.check-cell:nth-child(2n){border-right:none;}
+.check-cell:nth-last-child(-n+2){border-bottom:none;}
+.check-cell input{display:none;}
+.chk-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--sep-d);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.check-cell:has(input:checked) .chk-box{background:var(--navy);border-color:var(--navy);}
+.check-cell:has(input:checked) .chk-box::after{content:'';width:5px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);}
+.check-cell:has(input:checked){color:var(--navy);font-weight:500;}
+
+/* ── NOTES ── */
+.note-entry{margin:0 16px 7px;background:var(--bg-card);border-radius:12px;border:.5px solid var(--sep);overflow:hidden;}
+.note-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-bottom:.5px solid var(--sep);}
+.note-time{font-family:var(--mono);font-size:12px;font-weight:500;background:transparent;border:none;outline:none;color:var(--text);}
+.note-del{margin-left:auto;background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;}
+.note-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:7px 12px 1px;}
+.note-field input{display:block;width:100%;font-family:var(--font);font-size:13px;color:var(--text);background:transparent;border:none;outline:none;padding:3px 12px 8px;border-top:.5px solid var(--sep);}
+
+/* ── SUMMARY ── */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;margin:0 16px 10px;gap:8px;}
+.sum-box{background:var(--bg-card);border-radius:14px;border:.5px solid var(--sep);padding:12px 14px;}
+.sum-box-lbl{font-size:11px;color:var(--text-3);font-weight:500;margin-bottom:3px;}
+.sum-box-val{font-family:var(--mono);font-size:20px;font-weight:600;}
+.sum-box-val.good{color:var(--green);}.sum-box-val.warn{color:var(--orange);}.sum-box-val.danger{color:var(--red);}
+.sum-card{margin:0 16px 8px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-top:.5px solid var(--sep);}
+.sum-row:first-child{border-top:none;}
+.sum-key{font-size:13px;color:var(--text-2);}
+.sum-val{font-family:var(--mono);font-size:13px;font-weight:600;}
+.sum-val.good{color:var(--green);}.sum-val.warn{color:var(--orange);}.sum-val.danger{color:var(--red);}
+
+/* ── BUTTONS ── */
+.actions{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.act-btn{width:100%;padding:14px;border-radius:14px;border:none;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s,transform .1s;}
+.act-btn:active{opacity:.75;transform:scale(.98);}
+.act-btn.primary{background:var(--navy);color:#fff;}
+.act-btn.ghost{background:var(--bg-card);color:var(--text);border:.5px solid var(--sep-d);}
+.act-btn.danger{background:var(--red);color:#fff;}
+.save-msg{text-align:center;font-size:12px;color:var(--text-3);padding:5px;}
+.save-msg.ok{color:var(--green);font-weight:500;}.save-msg.err{color:var(--red);font-weight:500;}
+.add-btn{margin:0 16px 4px;width:calc(100% - 32px);padding:12px;background:var(--bg-card);
+  border:.5px dashed var(--sep-d);border-radius:14px;font-family:var(--font);font-size:14px;font-weight:600;color:var(--blue);cursor:pointer;}
+.add-btn:active{background:var(--blue-bg);}
+
+/* ── AI SCAN BUTTONS ── */
+.ai-bar{margin:0 16px 8px;display:flex;gap:8px;}
+.ai-btn{flex:1;padding:12px;border:none;border-radius:14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;}
+.ai-btn:active{opacity:.8;}
+.ai-btn.scan{background:var(--navy);color:#fff;}
+.ai-btn.ekg{background:var(--blue);color:#fff;}
+
+/* ── CHART ── */
+.chart-wrap{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);padding:14px;}
+.chart-wrap h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.chart-wrap canvas{max-height:180px!important;}
+.chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.lgnd{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-3);}
+.lgnd-dot{width:7px;height:7px;border-radius:50%;}
+
+/* ── REFS ── */
+.ref-card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.ref-item{padding:12px 16px;border-top:.5px solid var(--sep);}
+.ref-item:first-child{border-top:none;}
+.ref-num{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;background:var(--navy-bg);color:var(--blue);padding:2px 6px;border-radius:4px;margin-bottom:4px;}
+.ref-title{font-size:12px;font-weight:600;line-height:1.4;}
+.ref-meta{font-size:10px;color:var(--text-3);margin-top:2px;font-family:var(--mono);}
+.ref-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:3px;margin-top:4px;}
+.ref-badge.guideline{background:var(--green-bg);color:#166534;}
+.ref-badge.rct{background:#ede9fe;color:#5b21b6;}
+.ref-badge.review{background:var(--blue-bg);color:#1A4080;}
+.ref-badge.thai{background:var(--navy-bg);color:var(--navy);}
+
+/* ── EKG ALERT LEVELS ── */
+.ekg-immediate{background:#fff0f0;border:1.5px solid var(--red);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.ekg-urgent{background:var(--orange-bg);border:.5px solid rgba(255,149,0,.4);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.ekg-routine{background:var(--bg);border:.5px solid var(--sep);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+@media(prefers-color-scheme:dark){.ekg-immediate{background:rgba(255,59,48,.1);}}
+.ekg-level-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.ekg-immediate .ekg-level-tag{color:var(--red);}
+.ekg-urgent .ekg-level-tag{color:var(--orange);}
+.ekg-routine .ekg-level-tag{color:var(--text-3);}
+.ekg-finding{font-size:12px;font-weight:600;color:var(--text);}
+.ekg-action{font-size:11px;color:var(--text-2);margin-top:3px;line-height:1.45;}
+
+/* ── COMPLICATION TABLE ── */
+.comp-card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.comp-row{padding:11px 14px;border-top:.5px solid var(--sep);display:flex;align-items:flex-start;gap:10px;}
+.comp-row:first-child{border-top:none;}
+.comp-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.comp-body{flex:1;}
+.comp-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.comp-signs{font-size:11px;color:var(--text-2);margin-bottom:3px;}
+.comp-action{font-size:11px;color:var(--navy);font-weight:500;}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.modal-overlay.show{display:flex;}
+.modal-sheet{width:100%;max-width:500px;background:var(--bg-card);border-radius:22px 22px 0 0;
+  overflow:hidden;padding-bottom:env(safe-area-inset-bottom);max-height:92dvh;
+  display:flex;flex-direction:column;animation:slideUp .3s cubic-bezier(.32,0,.67,0) backwards;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--sep-d);border-radius:99px;margin:12px auto 4px;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 12px;}
+.modal-hdr h2{font-size:16px;font-weight:700;}
+.modal-close{background:var(--bg);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-3);}
+.modal-body{flex:1;overflow-y:auto;padding:0 20px 24px;}
+.upload-zone{border:2px dashed var(--sep-d);border-radius:16px;padding:24px 20px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.upload-sub{font-size:11px;color:var(--text-3);}
+.upload-preview{width:100%;border-radius:12px;max-height:220px;object-fit:contain;background:#000;margin-top:12px;display:none;}
+.ai-result{margin-top:14px;display:none;}
+.ai-result.show{display:block;}
+.ai-thinking{display:flex;align-items:center;gap:10px;padding:14px;background:var(--blue-bg);border-radius:12px;font-size:13px;color:var(--blue);font-weight:500;}
+.spin{width:18px;height:18px;border:2.5px solid rgba(58,123,213,.25);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.vr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
+.vr-box{background:var(--bg);border-radius:12px;padding:12px;border:.5px solid var(--sep);}
+.vr-key{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:3px;}
+.vr-val{font-family:var(--mono);font-size:20px;font-weight:600;}
+.vr-unit{font-size:11px;color:var(--text-3);}
+.vr-box.ok .vr-val{color:var(--green);}.vr-box.warn .vr-val{color:var(--orange);}.vr-box.danger .vr-val{color:var(--red);}
+.apply-btn{width:100%;margin-top:12px;padding:13px;background:var(--green);color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
+.ai-note{font-size:11px;color:var(--text-3);margin-top:8px;padding:8px 11px;background:var(--bg);border-radius:9px;line-height:1.5;}
+
+/* EKG modal */
+.ekg-rhythm-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;margin-top:8px;}
+.ekg-rhythm-badge.normal{background:var(--green-bg);color:#166534;}
+.ekg-rhythm-badge.warning{background:var(--orange-bg);color:#7A4500;}
+.ekg-rhythm-badge.abnormal{background:var(--red-bg);color:#8B1A1A;}
+.ekg-finding-row{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-top:6px;}
+.finding-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;}
+.finding-ico.ok{background:var(--green-bg);}.finding-ico.warn{background:var(--orange-bg);}.finding-ico.bad{background:var(--red-bg);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);left:16px;right:16px;
+  background:rgba(15,45,94,.96);color:#fff;font-size:13px;font-weight:500;padding:12px 18px;
+  border-radius:12px;text-align:center;z-index:9999;opacity:0;transform:translateY(8px);
+  transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:rgba(46,189,107,.95);}.toast.err{background:rgba(255,59,48,.95);}
+
+/* ── PRINT ── */
+
+/* ── GRID TABLE (vital + aldrete + assess, transposed) ── */
+.grid-table{border-collapse:collapse;width:100%;min-width:540px;}
+.grid-table th,.grid-table td{border:.5px solid var(--sep);}
+.grid-table .corner{background:var(--navy);position:sticky;left:0;z-index:3;}
+.grid-table .time-h{background:var(--navy);color:#fff;font-size:11px;font-weight:600;padding:6px 4px;text-align:center;min-width:46px;}
+.grid-table .time-h .th-now{display:block;font-size:8px;color:#9DBEFF;font-weight:700;}
+.grid-table .sec-h td{background:var(--navy-bg);color:var(--navy);font-size:10px;font-weight:700;text-align:left;padding:4px 10px;letter-spacing:.04em;position:sticky;left:0;}
+@media(prefers-color-scheme:dark){.grid-table .sec-h td{color:#7AADFF;}}
+.grid-table .rlbl{font-size:11px;color:var(--text-2);padding:5px 8px;background:var(--bg-card);white-space:nowrap;position:sticky;left:0;z-index:1;font-weight:500;}
+.grid-table .gcell{text-align:center;padding:0;background:var(--bg-card);}
+.grid-table .gcell.cur{background:rgba(58,123,213,.06);}
+.grid-table .gcell input{width:100%;border:none;background:transparent;font-family:var(--mono);font-size:12px;text-align:center;padding:6px 2px;color:var(--text);outline:none;}
+.grid-table .gcell input.ok{color:var(--green);}
+.grid-table .gcell input.warn{color:var(--orange);font-weight:600;}
+.grid-table .gcell input.danger{color:var(--red);font-weight:700;}
+.grid-table .gcell select{width:100%;border:none;background:transparent;font-family:var(--mono);font-size:14px;font-weight:600;text-align:center;padding:6px 0;color:var(--navy);cursor:pointer;-webkit-appearance:none;appearance:none;text-align-last:center;outline:none;}
+@media(prefers-color-scheme:dark){.grid-table .gcell select{color:#7AADFF;}}
+.grid-table .gcell select.auto{opacity:.5;pointer-events:none;}
+.grid-table .tot-row td{background:var(--green-bg);font-family:var(--mono);font-size:13px;font-weight:700;color:#166534;text-align:center;padding:6px 0;}
+@media(prefers-color-scheme:dark){.grid-table .tot-row td{color:var(--green);}}
+.grid-table .tot-row .tl{font-family:var(--font)!important;font-size:11px!important;text-align:right!important;padding-right:8px!important;position:sticky;left:0;}
+.ald-gloss{margin:6px 16px 10px;font-size:10.5px;color:var(--text-3);line-height:1.6;}
+.ald-gloss b{font-weight:600;color:var(--text-2);}
+.assess-legend{margin:6px 16px 10px;font-size:11px;color:var(--text-3);}
+.grid-table .acell{text-align:center;padding:0;background:var(--bg-card);}
+.grid-table .acell button{width:100%;border:none;background:transparent;font-size:15px;padding:6px 0;cursor:pointer;color:var(--text-3);font-family:var(--mono);}
+.grid-table .acell button.yes{color:var(--green);font-weight:700;}
+.grid-table .acell button.no{color:var(--text-3);}
+
+
+/* ── COMMAND CENTER ── */
+.cc-head{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 16px 6px;}
+.cc-sub{font-size:13px;color:var(--text-3);}
+.cc-refresh{background:var(--bg-card);border:.5px solid var(--sep-d);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--blue);cursor:pointer;flex-shrink:0;}
+.cc-refresh:active{transform:scale(.92);}
+.cc-sec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);padding:10px 16px 4px;display:flex;align-items:center;gap:6px;}
+.bed-card{margin:0 16px 8px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);border-left-width:4px;cursor:pointer;transition:transform .1s;overflow:hidden;}
+.bed-card:active{transform:scale(.985);}
+.bed-card.g{border-left-color:var(--green);}
+.bed-card.y{border-left-color:var(--orange);}
+.bed-card.r{border-left-color:var(--red);background:var(--red-bg);}
+.bed-inner{padding:12px 14px;}
+.bed-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.bed-id{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;}
+.bed-stat{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.bed-stat.g{background:var(--green-bg);color:#166534;}
+.bed-stat.y{background:var(--orange-bg);color:#7A4500;}
+.bed-stat.r{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.bed-stat.g{color:var(--green);}.bed-stat.y{color:var(--orange);}.bed-stat.r{color:var(--red);}}
+.bed-name{font-size:12px;color:var(--text-2);}
+.bed-op{font-size:11px;color:var(--text-3);margin-top:1px;}
+.bed-chips{display:flex;gap:5px;margin-top:9px;padding-top:9px;border-top:.5px solid var(--sep);flex-wrap:wrap;align-items:center;}
+.bed-chip{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--text-3);}
+.bed-chip.ok{background:var(--green-bg);color:#166534;}
+.bed-chip.bad{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.bed-chip.ok{color:var(--green);}.bed-chip.bad{color:var(--red);}}
+.bed-chip.timer{margin-left:auto;background:var(--orange-bg);color:#7A4500;}
+@media(prefers-color-scheme:dark){.bed-chip.timer{color:var(--orange);}}
+.bed-why{font-size:11px;color:#8B1A1A;margin-top:8px;display:flex;align-items:flex-start;gap:5px;font-weight:600;line-height:1.4;}
+@media(prefers-color-scheme:dark){.bed-why{color:var(--red);}}
+.nav-badge-wrap{position:relative;display:inline-flex;align-items:center;}
+.nav-dot{width:7px;height:7px;border-radius:50%;background:var(--red);position:absolute;top:-2px;right:-9px;}
+/* alerts center */
+.alert-pt-group{margin-bottom:14px;}
+.alert-pt-hdr{font-size:12px;font-weight:700;color:var(--text);padding:4px 0 6px;display:flex;align-items:center;gap:6px;}
+
+
+/* empty/unfilled grid selects look muted, not 'answered' */
+.grid-table .gcell select.empty{color:var(--text-3)!important;font-weight:400!important;}
+.grid-table .gcell select.ekgsel{font-weight:500;color:var(--navy);}
+@media(prefers-color-scheme:dark){.grid-table .gcell select.ekgsel{color:#7AADFF;}}
+.grid-table .gcell select.ekgsel.empty{color:var(--text-3)!important;}
+.grid-table .tot-row td{color:#166534;}
+
+
+/* ── จำกัดความกว้างเนื้อหา ไม่ให้ field กางเต็มจอ ── */
+.app-wrap{max-width:560px;margin:0 auto;}
+.app-header .hdr-row,.bottom-nav{max-width:560px;margin-left:auto;margin-right:auto;}
+.bottom-nav{left:0;right:0;}
+@media(min-width:600px){
+  .app-header{padding-left:max(16px,calc(50% - 280px + 16px));padding-right:max(16px,calc(50% - 280px + 16px));}
+}
+/* new-patient intake modal field rows */
+.intake-form{display:flex;flex-direction:column;}
+.intake-row{display:flex;align-items:center;padding:10px 0;border-top:.5px solid var(--sep);gap:10px;}
+.intake-row:first-child{border-top:none;}
+.intake-row label{font-size:13px;color:var(--text-2);flex:0 0 130px;}
+.intake-row input,.intake-row select{flex:1;font-family:var(--font);font-size:14px;color:var(--text);background:var(--bg);border:.5px solid var(--sep-d);border-radius:8px;padding:9px 11px;outline:none;min-width:0;}
+.intake-row.bp-row{gap:6px;}
+.intake-row.bp-row input{flex:1;}
+.intake-type{display:flex;gap:8px;margin-bottom:6px;}
+.intake-type button{flex:1;font-family:var(--font);font-size:13px;font-weight:600;border:1.5px solid var(--sep-d);background:var(--bg);color:var(--text-2);border-radius:10px;padding:11px 4px;cursor:pointer;}
+.intake-type button.on{background:var(--navy);color:#fff;border-color:var(--navy);}
+.intake-go{width:100%;margin-top:14px;padding:14px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;}
+.intake-go:active{opacity:.8;}
+
+
+.type-indicator{margin:8px 16px 10px;font-size:12px;font-weight:600;color:var(--navy);background:var(--navy-bg);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;}
+@media(prefers-color-scheme:dark){.type-indicator{color:#7AADFF;}}
+.info-note{margin:0 16px 10px;font-size:12px;color:var(--text-2);background:var(--bg);border:.5px solid var(--sep);border-radius:10px;padding:10px 12px;line-height:1.5;}
+
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff;font-size:9pt;color:#000;}
+  .app-header,.bottom-nav,.sub-nav,.type-bar,.op-bar,.ai-bar,.add-btn,.actions,.modal-overlay,.toast{display:none!important;}
+  .app-wrap{padding:0;}
+  .tab-page{display:none!important;}
+  .print-doc{display:grid!important;width:210mm;padding:10mm 12mm;grid-template-columns:1fr 1fr;gap:4mm;box-sizing:border-box;}
+  .print-full{grid-column:1/-1;}
+  .p-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4mm;padding-bottom:3mm;border-bottom:1.5pt solid #000;}
+  .p-logo{font-size:12pt;font-weight:700;color:#0F2D5E;}
+  .p-hdr-title{font-size:12pt;font-weight:700;}
+  .p-sec{margin-bottom:3mm;}
+  .p-sec-title{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555;border-bottom:.5pt solid #ccc;padding-bottom:1mm;margin-bottom:2mm;}
+  .p-table{width:100%;border-collapse:collapse;font-size:7.5pt;}
+  .p-table th{background:#0F2D5E;color:#fff;font-weight:700;padding:2mm;border:.5pt solid #ccc;text-align:center;}
+  .p-table td{padding:1.5mm 2mm;border:.5pt solid #ccc;text-align:center;}
+  .p-table td.lbl{text-align:left;font-weight:500;background:#f5f8ff;}
+  .p-kv{display:flex;justify-content:space-between;padding:1mm 0;border-bottom:.25pt solid #eee;font-size:7.5pt;}
+  .p-kv:last-child{border-bottom:none;}
+  .p-k{color:#444;}.p-v{font-weight:600;}
+  .p-v.ok{color:#166534;}.p-v.warn{color:#7A4500;}.p-v.danger{color:#8B1A1A;}
+  .p-badge{display:inline-block;padding:1mm 2.5mm;border-radius:2mm;font-size:7pt;font-weight:700;}
+  .p-badge.ready{background:#e5fff1;color:#166534;}.p-badge.observe{background:#fff4e0;color:#7A4500;}.p-badge.alert{background:#ffeceb;color:#8B1A1A;}
+  .p-sign{border-top:.5pt solid #000;margin-top:3mm;padding-top:1mm;font-size:7pt;color:#555;text-align:center;}
+}
+.print-doc{display:none;}
+</style>
+
+<script>
+if(typeof google==='undefined'){window.google={script:{run:{_s:null,_f:null,
+ withSuccessHandler:function(f){this._s=f;return this;},
+ withFailureHandler:function(f){this._f=f;return this;},
+ analyzeVitals:function(){var s=this._s;setTimeout(function(){s&&s({sbp:'122',dbp:'78',pulse:'72',rr:'16',temp:'36.5',spo2:'98',pain:'2',confidence:'high'});},900);},
+ analyzeEKG:function(){var s=this._s;setTimeout(function(){s&&s({rhythm:'Normal Sinus Rhythm',rate:72,status:'normal',findings:[{type:'ok',text:'Rhythm สม่ำเสมอ'},{type:'ok',text:'HR 72 bpm ปกติ'}]});},900);},
+ savePacuRecord:function(){var s=this._s;setTimeout(function(){s&&s({success:true,recordId:'R'+Date.now()});},600);},
+ getActivePatients:function(){var f=this._f;setTimeout(function(){f&&f();},10);},
+ getPatientRecord:function(){var s=this._s;setTimeout(function(){s&&s(null);},10);}
+}}};}
+</script>
+</head>
+<body>
+
+type html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PACU Ready AI v4</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F0F4FA;--bg-card:#FFF;--text:#1C1C1E;--text-2:#3C3C43;--text-3:#8E8E93;
+  --sep:rgba(60,60,67,.1);--sep-d:rgba(60,60,67,.2);
+  --navy:#0F2D5E;--navy-2:#1A4080;--navy-bg:#EBF2FF;
+  --blue:#3A7BD5;--blue-bg:#EBF4FF;
+  --green:#2EBD6B;--green-bg:#E5FFF1;
+  --orange:#FF9500;--orange-bg:#FFF4E0;
+  --red:#FF3B30;--red-bg:#FFECEB;
+  --purple:#7B5EA7;--teal:#32ADE6;
+  --font:'IBM Plex Sans Thai',sans-serif;
+  --mono:'IBM Plex Mono',monospace;
+  --nav-h:58px;--hdr-h:62px;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0A0F1A;--bg-card:#111827;--text:#F0F4FF;--text-2:#C0CCDE;--text-3:#6B7A99;
+  --sep:rgba(100,120,180,.18);--sep-d:rgba(100,120,180,.32);
+  --navy:#1E3A6E;--navy-2:#2A5098;--navy-bg:rgba(58,123,213,.15);
+  --blue-bg:rgba(58,123,213,.18);--green-bg:rgba(46,189,107,.12);
+  --orange-bg:rgba(255,149,0,.12);--red-bg:rgba(255,59,48,.12);
+}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;min-height:100dvh;}
+.app-wrap{padding-top:var(--hdr-h);padding-bottom:calc(var(--nav-h)+env(safe-area-inset-bottom));}
+
+/* ── HEADER ── */
+.app-header{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--hdr-h);
+  background:var(--navy);display:flex;align-items:flex-end;padding:0 16px 10px;}
+.hdr-row{display:flex;align-items:center;width:100%;}
+.brand{display:flex;align-items:center;gap:10px;flex:1;}
+.brand-icon{width:36px;height:36px;background:rgba(255,255,255,.1);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-icon svg{width:24px;height:24px;}
+.brand-texts h1{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.2px;line-height:1.2;}
+.brand-texts small{font-size:9px;color:rgba(255,255,255,.5);}
+.ai-pill{font-size:10px;font-weight:700;background:var(--blue);color:#fff;padding:2px 7px;border-radius:10px;margin-left:5px;}
+.hdr-btn{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);color:#fff;
+  font-family:var(--font);font-size:12px;font-weight:600;border:none;border-radius:20px;
+  padding:7px 13px;cursor:pointer;transition:opacity .15s;}
+.hdr-btn:active{opacity:.7;}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);
+  background:rgba(240,244,250,.96);backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);border-top:.5px solid var(--sep);
+  display:flex;align-items:center;padding-bottom:env(safe-area-inset-bottom);z-index:300;}
+@media(prefers-color-scheme:dark){.bottom-nav{background:rgba(10,15,26,.94);}}
+.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:0 2px;cursor:pointer;border:none;background:transparent;
+  font-family:var(--font);color:var(--text-3);transition:transform .1s;}
+.nav-tab:active{transform:scale(.88);}
+.nav-tab.active{color:var(--blue);}
+.nav-tab svg{width:22px;height:22px;stroke-width:1.7;}
+.nav-tab span{font-size:9px;font-weight:500;}
+
+/* ── PAGES ── */
+.tab-page{display:none;padding-bottom:20px;}
+.tab-page.active{display:block;}
+.page-title{font-size:20px;font-weight:700;padding:14px 16px 6px;letter-spacing:-.3px;}
+.page-sub{font-size:13px;color:var(--text-3);padding:0 16px 10px;line-height:1.5;}
+.section-hdr{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--text-3);padding:12px 16px 4px;display:flex;align-items:center;gap:6px;}
+
+/* ── METRICS ── */
+.metrics-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px;margin-bottom:10px;}
+.metric-box{background:var(--bg-card);border-radius:12px;border:.5px solid var(--sep);padding:10px 4px;text-align:center;}
+.m-num{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1;margin-bottom:2px;}
+.m-num.blue{color:var(--blue);}.m-num.green{color:var(--green);}.m-num.orange{color:var(--orange);}.m-num.red{color:var(--red);}
+.m-lbl{font-size:9px;color:var(--text-3);font-weight:500;}
+
+/* ── PATIENT CARDS ── */
+.pt-list{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.pt-card{background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);cursor:pointer;transition:transform .1s;}
+.pt-card:active{transform:scale(.98);}
+.pt-inner{padding:12px 14px;}
+.pt-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px;}
+.pt-name{font-size:15px;font-weight:600;}
+.pt-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 9px;border-radius:20px;}
+.pt-badge.ready{background:var(--green-bg);color:#166534;}
+.pt-badge.observe{background:var(--orange-bg);color:#7A4500;}
+.pt-badge.alert{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.pt-badge.ready{color:var(--green);}.pt-badge.observe{color:var(--orange);}.pt-badge.alert{color:var(--red);}}
+.pt-hn{font-size:11px;color:var(--text-3);font-family:var(--mono);margin-bottom:1px;}
+.pt-op{font-size:12px;color:var(--text-2);}
+.pt-pills{display:flex;gap:5px;margin-top:8px;padding-top:8px;border-top:.5px solid var(--sep);}
+.pt-pill{font-family:var(--mono);font-size:11px;padding:3px 8px;border-radius:20px;background:var(--bg);color:var(--text-3);}
+.pt-pill.good{background:var(--green-bg);color:#166534;}
+@media(prefers-color-scheme:dark){.pt-pill.good{color:var(--green);}}
+
+/* ── STATUS STRIP ── */
+.status-strip{margin:10px 16px;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;border:.5px solid transparent;transition:all .3s;}
+.status-strip.ready{background:var(--green-bg);border-color:rgba(46,189,107,.3);}
+.status-strip.observe{background:var(--orange-bg);border-color:rgba(255,149,0,.3);}
+.status-strip.alert{background:var(--red-bg);border-color:rgba(255,59,48,.3);}
+.ss-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+.ss-score{font-family:var(--mono);font-size:28px;font-weight:600;line-height:1;}
+.ss-scoremax{font-size:10px;color:var(--text-3);font-family:var(--mono);}
+.status-strip.ready .ss-score{color:var(--green);}
+.status-strip.observe .ss-score{color:var(--orange);}
+.status-strip.alert .ss-score{color:var(--red);}
+.ss-div{width:.5px;height:36px;background:var(--sep-d);flex-shrink:0;}
+.ss-info{flex:1;min-width:0;}
+.ss-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;}
+.status-strip.ready .ss-badge{color:var(--green);}
+.status-strip.observe .ss-badge{color:var(--orange);}
+.status-strip.alert .ss-badge{color:var(--red);}
+.ss-title{font-size:13px;font-weight:600;line-height:1.3;}
+.ss-desc{font-size:11px;color:var(--text-2);}
+.ss-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.ss-sub{display:flex;align-items:center;gap:4px;}
+.ss-sub-lbl{font-size:10px;color:var(--text-3);}
+.ss-sub-val{font-family:var(--mono);font-size:12px;font-weight:600;}
+.timer-pill{font-family:var(--mono);font-size:11px;padding:2px 8px;border-radius:20px;
+  background:rgba(15,45,94,.08);color:var(--navy);}
+@media(prefers-color-scheme:dark){.timer-pill{background:rgba(255,255,255,.08);color:var(--text-2);}}
+.timer-pill.mid{color:var(--orange);}.timer-pill.lng{color:var(--red);}
+
+/* ── ALERTS ── */
+.alert-list{margin:0 16px 6px;display:flex;flex-direction:column;gap:5px;}
+.alert-chip{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:500;line-height:1.45;}
+.alert-chip.warn{background:var(--orange-bg);color:#7A4500;}
+.alert-chip.danger{background:var(--red-bg);color:#8B1A1A;}
+.alert-chip.info{background:var(--blue-bg);color:#1A4080;}
+@media(prefers-color-scheme:dark){.alert-chip.warn{color:#FFA040;}.alert-chip.danger{color:#FF7070;}.alert-chip.info{color:#7AADFF;}}
+.alert-ico{flex-shrink:0;margin-top:1px;}
+.alert-body{flex:1;}
+.alert-title{font-weight:700;margin-bottom:1px;}
+.alert-action{font-size:11px;opacity:.8;margin-top:2px;}
+.next-wrap{padding:0 16px 6px;display:flex;align-items:center;gap:8px;}
+.next-badge{font-size:11px;font-weight:600;color:var(--blue);background:var(--blue-bg);padding:4px 10px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+.countdown{font-family:var(--mono);font-weight:700;}
+
+/* ── TYPE TOGGLE ── */
+.type-bar{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.type-btn{flex:1;font-family:var(--font);font-size:12px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:8px 4px;cursor:pointer;transition:all .2s;}
+.type-btn.active{background:var(--navy);color:#fff;}
+
+/* ── OP TYPE TOGGLE ── */
+.op-bar{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.op-btn{flex:1;font-family:var(--font);font-size:11px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:7px 4px;cursor:pointer;transition:all .2s;}
+.op-btn.active{background:var(--blue);color:#fff;}
+
+/* ── SUB-TABS ── */
+.sub-nav{display:flex;margin:0 16px 10px;background:var(--bg-card);border-radius:11px;border:.5px solid var(--sep);padding:3px;gap:2px;}
+.sub-tab{flex:1;font-family:var(--font);font-size:10.5px;font-weight:600;border:none;background:transparent;color:var(--text-3);border-radius:8px;padding:7px 2px;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.sub-tab.active{background:var(--navy);color:#fff;}
+.sub-panel{display:none;}
+.sub-panel.active{display:block;}
+
+/* ── CARDS / FORM ── */
+.card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.form-row{display:flex;align-items:center;padding:11px 15px;border-top:.5px solid var(--sep);min-height:46px;}
+.form-row:first-child{border-top:none;}
+.row-lbl{font-size:14px;color:var(--text);flex:0 0 110px;}
+.row-inp{flex:1;font-family:var(--font);font-size:14px;color:var(--text);background:transparent;border:none;outline:none;text-align:right;min-height:40px;padding:0 0 0 8px;}
+.row-inp::placeholder{color:var(--text-3);}
+select.row-inp{appearance:none;cursor:pointer;}
+
+/* ── SPINAL BOX ── */
+.spinal-box{margin:0 16px 10px;background:var(--navy-bg);border-radius:14px;padding:12px 14px;border:.5px solid rgba(58,123,213,.2);}
+.spinal-title{font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+@media(prefers-color-scheme:dark){.spinal-title{color:#7AADFF;}}
+.spinal-row{display:flex;justify-content:space-between;align-items:flex-start;padding:4px 0;border-top:.5px solid rgba(58,123,213,.1);}
+.spinal-row:first-of-type{border-top:none;}
+.spinal-key{font-size:12px;color:var(--text-2);}
+.spinal-val{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--blue);text-align:right;max-width:60%;}
+
+/* ── TIMELINE ── */
+.tl-wrap{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.tl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.tl-table{width:100%;border-collapse:collapse;min-width:540px;}
+.tl-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  color:rgba(255,255,255,.75);padding:8px 8px;background:var(--navy);text-align:center;white-space:nowrap;}
+.tl-table th:first-child{text-align:left;position:sticky;left:0;z-index:2;background:var(--navy);color:#fff;padding-left:12px;}
+.tl-table td{font-family:var(--mono);font-size:12px;padding:7px 6px;border-bottom:.5px solid var(--sep);text-align:center;vertical-align:middle;}
+.tl-table tr:last-child td{border-bottom:none;}
+.tl-table td:first-child{font-family:var(--font);font-size:12px;font-weight:600;text-align:left;
+  position:sticky;left:0;background:var(--bg-card);z-index:1;color:var(--navy);padding:7px 6px 7px 12px;white-space:nowrap;}
+.tl-row-cur td{background:rgba(58,123,213,.05);}
+.tl-row-cur td:first-child{background:rgba(58,123,213,.07);}
+.tl-inp{font-family:var(--mono);font-size:12px;background:transparent;border:none;outline:none;width:44px;text-align:center;color:var(--text);padding:2px;}
+.tl-inp.ok{color:var(--green);font-weight:600;}.tl-inp.warn{color:var(--orange);font-weight:600;}.tl-inp.danger{color:var(--red);font-weight:700;}
+.ald-cell{font-family:var(--mono);font-size:12px;font-weight:700;width:28px;height:22px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;}
+.ald-cell.good{background:var(--green-bg);color:#166534;}
+.ald-cell.warn{background:var(--orange-bg);color:#7A4500;}
+.ald-cell.danger{background:var(--red-bg);color:#8B1A1A;}
+@media(prefers-color-scheme:dark){.ald-cell.good{color:var(--green);}.ald-cell.warn{color:var(--orange);}.ald-cell.danger{color:var(--red);}}
+.ald-cell.pending{background:var(--navy-bg);color:var(--blue);}
+.tl-now-tag{font-size:9px;color:var(--blue);font-weight:700;display:block;}
+.tl-time{font-size:13px;}
+
+/* Aldrete sub-rows inside timeline */
+.ald-sub-hdr{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:var(--navy-bg);border-top:.5px solid rgba(58,123,213,.2);}
+.ald-sub-label{font-size:10px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+@media(prefers-color-scheme:dark){.ald-sub-label{color:#7AADFF;}}
+.ald-opts{display:flex;flex-direction:column;gap:10px;padding:8px 12px 12px;}
+.ald-crit{}
+.ald-crit-lbl{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.ald-auto{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 6px;border-radius:10px;}
+.ald-crit-opts{display:flex;flex-direction:column;gap:4px;}
+.ald-full-btn{font-family:var(--font);font-size:12px;text-align:left;padding:8px 11px;border-radius:9px;border:1.5px solid var(--sep-d);background:var(--bg);color:var(--text-2);cursor:pointer;line-height:1.35;transition:all .12s;}
+.ald-full-btn.sel{background:var(--navy-bg);color:var(--navy);border-color:var(--navy);font-weight:600;}
+@media(prefers-color-scheme:dark){.ald-full-btn.sel{color:#7AADFF;}}
+
+/* ── SCORE ACCORDION ── */
+.score-wrap{margin:0 16px 8px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.score-hdr-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border:none;background:transparent;cursor:pointer;font-family:var(--font);}
+.score-hdr-left{text-align:left;}
+.score-hdr-left h3{font-size:15px;font-weight:600;color:var(--text);}
+.score-hdr-left p{font-size:11px;color:var(--text-3);margin-top:1px;}
+.score-hdr-right{display:flex;align-items:center;gap:8px;}
+.score-total{font-family:var(--mono);font-size:26px;font-weight:600;}
+.score-total.good{color:var(--green);}.score-total.warn{color:var(--orange);}.score-total.danger{color:var(--red);}
+.score-chevron{width:18px;height:18px;color:var(--text-3);transition:transform .25s;flex-shrink:0;}
+.score-wrap.open .score-chevron{transform:rotate(180deg);}
+.score-body{display:none;border-top:.5px solid var(--sep);}
+.score-wrap.open .score-body{display:block;}
+.score-bar-wrap{padding:4px 16px 10px;}
+.score-bar{height:4px;background:var(--bg);border-radius:99px;overflow:hidden;margin:6px 0 4px;}
+.score-fill{height:100%;border-radius:99px;transition:width .4s,background .3s;}
+.score-fill.good{background:var(--green);}.score-fill.warn{background:var(--orange);}.score-fill.danger{background:var(--red);}
+.score-status-lbl{font-size:11px;font-weight:600;}
+.score-status-lbl.good{color:var(--green);}.score-status-lbl.warn{color:var(--orange);}.score-status-lbl.danger{color:var(--red);}
+.criteria{border-top:.5px solid var(--sep);}
+.crit-item{padding:10px 16px;border-bottom:.5px solid var(--sep);}
+.crit-item:last-child{border-bottom:none;}
+.crit-lbl{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+.auto-tag{font-size:9px;font-weight:700;color:var(--green);background:var(--green-bg);padding:2px 6px;border-radius:10px;}
+.crit-opts{display:flex;flex-direction:column;gap:4px;}
+.crit-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;background:var(--bg);border:1.5px solid transparent;cursor:pointer;font-size:12px;color:var(--text-2);transition:all .12s;}
+.crit-opt input{display:none;}
+.radio-ring{width:18px;height:18px;border-radius:50%;border:2px solid var(--sep-d);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.crit-opt.sel{border-color:var(--navy);background:var(--navy-bg);color:var(--navy);font-weight:500;}
+.crit-opt.sel .radio-ring{border-color:var(--navy);background:var(--navy);}
+.crit-opt.sel .radio-ring::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;}
+
+/* ── DRUGS ── */
+.drug-entry{margin:0 16px 8px;background:var(--bg-card);border-radius:14px;border:.5px solid var(--sep);overflow:hidden;}
+.drug-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:var(--bg);border-bottom:.5px solid var(--sep);}
+.drug-select{font-family:var(--font);font-size:14px;font-weight:600;background:transparent;border:none;outline:none;color:var(--text);flex:1;cursor:pointer;appearance:none;}
+.drug-del{background:var(--red-bg);border:none;border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;color:var(--red);cursor:pointer;}
+.drug-body{display:grid;grid-template-columns:1fr 1fr;}
+.drug-field{padding:9px 14px;border-right:.5px solid var(--sep);border-bottom:.5px solid var(--sep);}
+.drug-field:nth-child(2n){border-right:none;}
+.drug-field:nth-last-child(-n+2){border-bottom:none;}
+.drug-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);margin-bottom:3px;}
+.drug-field input{font-family:var(--mono);font-size:14px;font-weight:500;background:transparent;border:none;outline:none;color:var(--text);width:100%;}
+.drug-monitor-box{margin:0 16px 10px;background:var(--orange-bg);border-radius:12px;padding:11px 14px;border:.5px solid rgba(255,149,0,.25);}
+.drug-monitor-title{font-size:10px;font-weight:700;color:#7A4500;text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+@media(prefers-color-scheme:dark){.drug-monitor-title{color:#FFA040;}}
+.drug-monitor-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-top:.5px solid rgba(255,149,0,.15);}
+.drug-monitor-item:first-of-type{border-top:none;}
+.drug-dot{width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:4px;}
+
+/* ── CHECKS ── */
+.checks-grid{display:grid;grid-template-columns:1fr 1fr;}
+.check-cell{display:flex;align-items:center;gap:7px;padding:11px 14px;border-right:.5px solid var(--sep);border-bottom:.5px solid var(--sep);cursor:pointer;font-size:13px;color:var(--text-2);}
+.check-cell:nth-child(2n){border-right:none;}
+.check-cell:nth-last-child(-n+2){border-bottom:none;}
+.check-cell input{display:none;}
+.chk-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--sep-d);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.check-cell:has(input:checked) .chk-box{background:var(--navy);border-color:var(--navy);}
+.check-cell:has(input:checked) .chk-box::after{content:'';width:5px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px);}
+.check-cell:has(input:checked){color:var(--navy);font-weight:500;}
+
+/* ── NOTES ── */
+.note-entry{margin:0 16px 7px;background:var(--bg-card);border-radius:12px;border:.5px solid var(--sep);overflow:hidden;}
+.note-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--bg);border-bottom:.5px solid var(--sep);}
+.note-time{font-family:var(--mono);font-size:12px;font-weight:500;background:transparent;border:none;outline:none;color:var(--text);}
+.note-del{margin-left:auto;background:none;border:none;color:var(--red);font-size:18px;cursor:pointer;}
+.note-field label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);padding:7px 12px 1px;}
+.note-field input{display:block;width:100%;font-family:var(--font);font-size:13px;color:var(--text);background:transparent;border:none;outline:none;padding:3px 12px 8px;border-top:.5px solid var(--sep);}
+
+/* ── SUMMARY ── */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;margin:0 16px 10px;gap:8px;}
+.sum-box{background:var(--bg-card);border-radius:14px;border:.5px solid var(--sep);padding:12px 14px;}
+.sum-box-lbl{font-size:11px;color:var(--text-3);font-weight:500;margin-bottom:3px;}
+.sum-box-val{font-family:var(--mono);font-size:20px;font-weight:600;}
+.sum-box-val.good{color:var(--green);}.sum-box-val.warn{color:var(--orange);}.sum-box-val.danger{color:var(--red);}
+.sum-card{margin:0 16px 8px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.sum-row{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-top:.5px solid var(--sep);}
+.sum-row:first-child{border-top:none;}
+.sum-key{font-size:13px;color:var(--text-2);}
+.sum-val{font-family:var(--mono);font-size:13px;font-weight:600;}
+.sum-val.good{color:var(--green);}.sum-val.warn{color:var(--orange);}.sum-val.danger{color:var(--red);}
+
+/* ── BUTTONS ── */
+.actions{padding:0 16px;display:flex;flex-direction:column;gap:8px;}
+.act-btn{width:100%;padding:14px;border-radius:14px;border:none;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:opacity .15s,transform .1s;}
+.act-btn:active{opacity:.75;transform:scale(.98);}
+.act-btn.primary{background:var(--navy);color:#fff;}
+.act-btn.ghost{background:var(--bg-card);color:var(--text);border:.5px solid var(--sep-d);}
+.act-btn.danger{background:var(--red);color:#fff;}
+.save-msg{text-align:center;font-size:12px;color:var(--text-3);padding:5px;}
+.save-msg.ok{color:var(--green);font-weight:500;}.save-msg.err{color:var(--red);font-weight:500;}
+.add-btn{margin:0 16px 4px;width:calc(100% - 32px);padding:12px;background:var(--bg-card);
+  border:.5px dashed var(--sep-d);border-radius:14px;font-family:var(--font);font-size:14px;font-weight:600;color:var(--blue);cursor:pointer;}
+.add-btn:active{background:var(--blue-bg);}
+
+/* ── AI SCAN BUTTONS ── */
+.ai-bar{margin:0 16px 8px;display:flex;gap:8px;}
+.ai-btn{flex:1;padding:12px;border:none;border-radius:14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .15s;}
+.ai-btn:active{opacity:.8;}
+.ai-btn.scan{background:var(--navy);color:#fff;}
+.ai-btn.ekg{background:var(--blue);color:#fff;}
+
+/* ── CHART ── */
+.chart-wrap{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);padding:14px;}
+.chart-wrap h3{font-size:13px;font-weight:600;margin-bottom:3px;}
+.chart-wrap canvas{max-height:180px!important;}
+.chart-legend{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px;}
+.lgnd{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-3);}
+.lgnd-dot{width:7px;height:7px;border-radius:50%;}
+
+/* ── REFS ── */
+.ref-card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.ref-item{padding:12px 16px;border-top:.5px solid var(--sep);}
+.ref-item:first-child{border-top:none;}
+.ref-num{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;background:var(--navy-bg);color:var(--blue);padding:2px 6px;border-radius:4px;margin-bottom:4px;}
+.ref-title{font-size:12px;font-weight:600;line-height:1.4;}
+.ref-meta{font-size:10px;color:var(--text-3);margin-top:2px;font-family:var(--mono);}
+.ref-badge{display:inline-block;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 6px;border-radius:3px;margin-top:4px;}
+.ref-badge.guideline{background:var(--green-bg);color:#166534;}
+.ref-badge.rct{background:#ede9fe;color:#5b21b6;}
+.ref-badge.review{background:var(--blue-bg);color:#1A4080;}
+.ref-badge.thai{background:var(--navy-bg);color:var(--navy);}
+
+/* ── EKG ALERT LEVELS ── */
+.ekg-immediate{background:#fff0f0;border:1.5px solid var(--red);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.ekg-urgent{background:var(--orange-bg);border:.5px solid rgba(255,149,0,.4);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+.ekg-routine{background:var(--bg);border:.5px solid var(--sep);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+@media(prefers-color-scheme:dark){.ekg-immediate{background:rgba(255,59,48,.1);}}
+.ekg-level-tag{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.ekg-immediate .ekg-level-tag{color:var(--red);}
+.ekg-urgent .ekg-level-tag{color:var(--orange);}
+.ekg-routine .ekg-level-tag{color:var(--text-3);}
+.ekg-finding{font-size:12px;font-weight:600;color:var(--text);}
+.ekg-action{font-size:11px;color:var(--text-2);margin-top:3px;line-height:1.45;}
+
+/* ── COMPLICATION TABLE ── */
+.comp-card{margin:0 16px 10px;background:var(--bg-card);border-radius:16px;border:.5px solid var(--sep);overflow:hidden;}
+.comp-row{padding:11px 14px;border-top:.5px solid var(--sep);display:flex;align-items:flex-start;gap:10px;}
+.comp-row:first-child{border-top:none;}
+.comp-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.comp-body{flex:1;}
+.comp-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.comp-signs{font-size:11px;color:var(--text-2);margin-bottom:3px;}
+.comp-action{font-size:11px;color:var(--navy);font-weight:500;}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;
+  display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.modal-overlay.show{display:flex;}
+.modal-sheet{width:100%;max-width:500px;background:var(--bg-card);border-radius:22px 22px 0 0;
+  overflow:hidden;padding-bottom:env(safe-area-inset-bottom);max-height:92dvh;
+  display:flex;flex-direction:column;animation:slideUp .3s cubic-bezier(.32,0,.67,0) backwards;}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.modal-handle{width:36px;height:4px;background:var(--sep-d);border-radius:99px;margin:12px auto 4px;}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 12px;}
+.modal-hdr h2{font-size:16px;font-weight:700;}
+.modal-close{background:var(--bg);border:none;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--text-3);}
+.modal-body{flex:1;overflow-y:auto;padding:0 20px 24px;}
+.upload-zone{border:2px dashed var(--sep-d);border-radius:16px;padding:24px 20px;text-align:center;cursor:pointer;position:relative;overflow:hidden;transition:all .2s;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:0;}
+.upload-icon{font-size:28px;margin-bottom:8px;}
+.upload-title{font-size:14px;font-weight:600;margin-bottom:3px;}
+.upload-sub{font-size:11px;color:var(--text-3);}
+.upload-preview{width:100%;border-radius:12px;max-height:220px;object-fit:contain;background:#000;margin-top:12px;display:none;}
+.ai-result{margin-top:14px;display:none;}
+.ai-result.show{display:block;}
+.ai-thinking{display:flex;align-items:center;gap:10px;padding:14px;background:var(--blue-bg);border-radius:12px;font-size:13px;color:var(--blue);font-weight:500;}
+.spin{width:18px;height:18px;border:2.5px solid rgba(58,123,213,.25);border-top-color:var(--blue);border-radius:50%;animation:spin 1s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.vr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px;}
+.vr-box{background:var(--bg);border-radius:12px;padding:12px;border:.5px solid var(--sep);}
+.vr-key{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text-3);margin-bottom:3px;}
+.vr-val{font-family:var(--mono);font-size:20px;font-weight:600;}
+.vr-unit{font-size:11px;color:var(--text-3);}
+.vr-box.ok .vr-val{color:var(--green);}.vr-box.warn .vr-val{color:var(--orange);}.vr-box.danger .vr-val{color:var(--red);}
+.apply-btn{width:100%;margin-top:12px;padding:13px;background:var(--green);color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;}
+.ai-note{font-size:11px;color:var(--text-3);margin-top:8px;padding:8px 11px;background:var(--bg);border-radius:9px;line-height:1.5;}
+
+/* EKG modal */
+.ekg-rhythm-badge{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;margin-top:8px;}
+.ekg-rhythm-badge.normal{background:var(--green-bg);color:#166534;}
+.ekg-rhythm-badge.warning{background:var(--orange-bg);color:#7A4500;}
+.ekg-rhythm-badge.abnormal{background:var(--red-bg);color:#8B1A1A;}
+.ekg-finding-row{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-top:6px;}
+.finding-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px;}
+.finding-ico.ok{background:var(--green-bg);}.finding-ico.warn{background:var(--orange-bg);}.finding-ico.bad{background:var(--red-bg);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);left:16px;right:16px;
+  background:rgba(15,45,94,.96);color:#fff;font-size:13px;font-weight:500;padding:12px 18px;
+  border-radius:12px;text-align:center;z-index:9999;opacity:0;transform:translateY(8px);
+  transition:opacity .25s,transform .25s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{background:rgba(46,189,107,.95);}.toast.err{background:rgba(255,59,48,.95);}
+
+/* ── PRINT ── */
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  body{background:#fff;font-size:9pt;color:#000;}
+  .app-header,.bottom-nav,.sub-nav,.type-bar,.op-bar,.ai-bar,.add-btn,.actions,.modal-overlay,.toast{display:none!important;}
+  .app-wrap{padding:0;}
+  .tab-page{display:none!important;}
+  .print-doc{display:grid!important;width:210mm;padding:10mm 12mm;grid-template-columns:1fr 1fr;gap:4mm;box-sizing:border-box;}
+  .print-full{grid-column:1/-1;}
+  .p-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:4mm;padding-bottom:3mm;border-bottom:1.5pt solid #000;}
+  .p-logo{font-size:12pt;font-weight:700;color:#0F2D5E;}
+  .p-hdr-title{font-size:12pt;font-weight:700;}
+  .p-sec{margin-bottom:3mm;}
+  .p-sec-title{font-size:7pt;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#555;border-bottom:.5pt solid #ccc;padding-bottom:1mm;margin-bottom:2mm;}
+  .p-table{width:100%;border-collapse:collapse;font-size:7.5pt;}
+  .p-table th{background:#0F2D5E;color:#fff;font-weight:700;padding:2mm;border:.5pt solid #ccc;text-align:center;}
+  .p-table td{padding:1.5mm 2mm;border:.5pt solid #ccc;text-align:center;}
+  .p-table td.lbl{text-align:left;font-weight:500;background:#f5f8ff;}
+  .p-kv{display:flex;justify-content:space-between;padding:1mm 0;border-bottom:.25pt solid #eee;font-size:7.5pt;}
+  .p-kv:last-child{border-bottom:none;}
+  .p-k{color:#444;}.p-v{font-weight:600;}
+  .p-v.ok{color:#166534;}.p-v.warn{color:#7A4500;}.p-v.danger{color:#8B1A1A;}
+  .p-badge{display:inline-block;padding:1mm 2.5mm;border-radius:2mm;font-size:7pt;font-weight:700;}
+  .p-badge.ready{background:#e5fff1;color:#166534;}.p-badge.observe{background:#fff4e0;color:#7A4500;}.p-badge.alert{background:#ffeceb;color:#8B1A1A;}
+  .p-sign{border-top:.5pt solid #000;margin-top:3mm;padding-top:1mm;font-size:7pt;color:#555;text-align:center;}
+}
+.print-doc{display:none;}
+</style>
+<header class="app-header">
+  <div class="hdr-row">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 100 100" fill="none">
+          <ellipse cx="50" cy="52" rx="28" ry="26" fill="rgba(255,255,255,.85)"/>
+          <rect x="34" y="70" width="10" height="14" rx="5" fill="rgba(255,255,255,.6)"/>
+          <rect x="56" y="70" width="10" height="14" rx="5" fill="rgba(255,255,255,.6)"/>
+          <ellipse cx="28" cy="44" rx="10" ry="8" fill="rgba(255,255,255,.65)" transform="rotate(-20 28 44)"/>
+          <ellipse cx="72" cy="44" rx="10" ry="8" fill="rgba(255,255,255,.65)" transform="rotate(20 72 44)"/>
+          <circle cx="43" cy="47" r="4" fill="#fff"/><circle cx="57" cy="47" r="4" fill="#fff"/>
+          <circle cx="44" cy="47" r="2" fill="#0F2D5E"/><circle cx="58" cy="47" r="2" fill="#0F2D5E"/>
+          <path d="M 44 56 Q 50 61 56 56" stroke="#3A7BD5" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="42" cy="38" r="2.5" fill="#FFB7C5" opacity=".9"/>
+          <circle cx="58" cy="38" r="2.5" fill="#FFB7C5" opacity=".9"/>
+        </svg>
+      </div>
+      <div class="brand-texts">
+        <h1>PACU Ready<span class="ai-pill">AI</span></h1>
+        <small>ระบบประเมินฟื้นตัวหลังผ่าตัด v4</small>
+      </div>
+    </div>
+    <button class="hdr-btn" id="addPatientBtn">
+      <svg width="12" height="12" viewBox="0 0 13 13" fill="none">
+        <line x1="6.5" y1="1" x2="6.5" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <line x1="1" y1="6.5" x2="12" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg> ผู้ป่วยใหม่
+    </button>
+  </div>
+</header>
+
+<div class="app-wrap">
+
+<!-- ═══ OVERVIEW ═══ -->
+<div class="tab-page active" id="tab-overview">
+  <div class="cc-head">
+    <div><p class="page-title" style="padding-bottom:2px;">Command Center</p><p class="cc-sub" id="ccSub">ห้องพักฟื้น</p></div>
+    <button class="cc-refresh" id="ccRefresh" title="โหลดใหม่"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 019-9 9 9 0 016.7 3M21 4v5h-5M21 12a9 9 0 01-9 9 9 9 0 01-6.7-3M3 20v-5h5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </div>
+  <div class="metrics-row">
+    <div class="metric-box"><div class="m-num blue" id="mToday">0</div><div class="m-lbl">ทั้งหมด</div></div>
+    <div class="metric-box"><div class="m-num green" id="mReady">0</div><div class="m-lbl">คงที่</div></div>
+    <div class="metric-box"><div class="m-num orange" id="mObserve">0</div><div class="m-lbl">ประเมิน</div></div>
+    <div class="metric-box"><div class="m-num red" id="mAlert">0</div><div class="m-lbl">แจ้งแพทย์</div></div>
+  </div>
+  <div id="ccAttention"></div>
+  <div id="ccStable"></div>
+  <div id="ccEmpty" style="display:none;text-align:center;padding:40px 20px;color:var(--text-3);">
+    <div style="font-size:36px;margin-bottom:8px;">🛏️</div>
+    <div style="font-size:14px;">ยังไม่มีผู้ป่วยในห้องพักฟื้น</div>
+    <div style="font-size:12px;margin-top:4px;">กด "+ ผู้ป่วยใหม่" มุมขวาบนเพื่อเริ่ม</div>
+  </div>
+</div>
+
+<!-- ═══ RECORD ═══ -->
+<div class="tab-page" id="tab-record">
+
+  <div class="status-strip ready" id="statusCard">
+    <div class="ss-left">
+      <div class="ss-score" id="combinedScore">10</div>
+      <div class="ss-scoremax">/10</div>
+    </div>
+    <div class="ss-div"></div>
+    <div class="ss-info">
+      <div class="ss-badge" id="sBadge">🟢 พร้อม (IPD)</div>
+      <div class="ss-title" id="sTitle">ผู้ป่วยพร้อมจำหน่าย</div>
+      <div class="ss-desc" id="sDesc">Aldrete Score อยู่ในเกณฑ์</div>
+    </div>
+    <div class="ss-right">
+      <div class="ss-sub"><span class="ss-sub-lbl">A</span><span class="ss-sub-val" id="ssA">10</span></div>
+      <div class="ss-sub" id="ssPWrap" style="display:none;"><span class="ss-sub-lbl">P</span><span class="ss-sub-val" id="ssP">10</span></div>
+      <span class="timer-pill" id="pacuTimer">—</span>
+    </div>
+  </div>
+
+  <div class="alert-list" id="alertList"></div>
+  <div class="next-wrap" id="nextWrap" style="display:none;">
+    <span class="next-badge">⏱ ประเมินถัดไปใน <span class="countdown" id="nextCd">—</span></span>
+  </div>
+
+  <div class="type-indicator" id="typeIndicator"></div>
+
+  <div class="sub-nav">
+    <button class="sub-tab active" data-sub="info" onclick="switchSub('info')">📋 ข้อมูล</button>
+    <button class="sub-tab" data-sub="timeline" onclick="switchSub('timeline')">📊 Timeline</button>
+    <button class="sub-tab" data-sub="drugs" onclick="switchSub('drugs')">💊 ยา RR</button>
+    <button class="sub-tab" id="subPadss" data-sub="scores" onclick="switchSub('scores')" style="display:none;">🎯 PADSS</button>
+    <button class="sub-tab" data-sub="dc" onclick="switchSub('dc')">🏥 จำหน่าย</button>
+  </div>
+
+  <form id="pacuForm">
+
+  <!-- INFO -->
+  <div class="sub-panel active" id="sub-info">
+    <div class="section-hdr">01 — ข้อมูลผู้ป่วย</div>
+    <div class="card">
+      <div class="form-row"><span class="row-lbl">วันที่</span><input class="row-inp" type="date" name="date"></div>
+      <div class="form-row"><span class="row-lbl">เวลาแรกรับ</span><input class="row-inp" type="time" name="timeArrival" id="arrivalInput"></div>
+      <div class="form-row"><span class="row-lbl">เตียง / Bed</span><input class="row-inp" type="text" name="bed" placeholder="เช่น 1, 2, 3"></div>
+<div class="form-row"><span class="row-lbl">HN</span><input class="row-inp" type="text" name="hn" placeholder="HN000000"></div>
+      <div class="form-row"><span class="row-lbl">ชื่อ-นามสกุล</span><input class="row-inp" type="text" name="patientName" placeholder="ชื่อผู้ป่วย"></div>
+      <div class="form-row"><span class="row-lbl">Baseline SBP</span><input class="row-inp" type="number" id="baselineSBP" name="baselineSBP" placeholder="mmHg" oninput="onBPChange()"></div>
+      <div class="form-row"><span class="row-lbl">Baseline DBP</span><input class="row-inp" type="number" id="baselineDBP" name="baselineDBP" placeholder="mmHg" oninput="onBPChange()"></div>
+    </div>
+    <div class="card">
+      <div class="form-row"><span class="row-lbl">การผ่าตัด</span><input class="row-inp" type="text" name="operation" placeholder="ชื่อหัตถการ"></div>
+      <div class="form-row"><span class="row-lbl">ศัลยแพทย์</span><input class="row-inp" type="text" name="surgeon" placeholder="ชื่อแพทย์"></div>
+      <div class="form-row"><span class="row-lbl">วิสัญญีแพทย์</span><input class="row-inp" type="text" name="anesthesiologist" placeholder="ชื่อแพทย์"></div>
+      <div class="form-row">
+        <span class="row-lbl">วิธีระงับ</span>
+        <select class="row-inp" name="anesthesiaTechnique" id="anesthTech" onchange="onAnesthChange()">
+          <option>GA (ยาสลบทั่วไป)</option><option>Spinal block</option>
+          <option>Epidural</option><option>MAC</option><option>Local anesthesia</option>
+        </select>
+      </div>
+      <div class="form-row" id="opTypeRow">
+        <span class="row-lbl">ประเภทผ่าตัด</span>
+        <select class="row-inp" name="opType" id="opType" onchange="S.opType=this.value;buildAlerts();">
+          <option value="lap">Laparoscopic / MIS</option>
+          <option value="open">Open laparotomy</option>
+        </select>
+      </div>
+      <div class="form-row" id="spinalLevelRow" style="display:none;">
+        <span class="row-lbl">Block Level</span>
+        <select class="row-inp" name="spinalLevel" id="spinalLevel" onchange="updateSpinalInfo()">
+          <option>T4</option><option>T6</option><option>T10</option>
+          <option selected>L1</option><option>L2</option><option>L3-4</option>
+        </select>
+      </div>
+      <div class="form-row" id="spinalDrugRow" style="display:none;">
+        <span class="row-lbl">ยา Spinal</span>
+        <select class="row-inp" name="spinalDrug" id="spinalDrug" onchange="updateSpinalInfo()">
+          <option>Heavy Bupivacaine 0.5%</option>
+          <option>Plain Bupivacaine 0.5%</option>
+          <option>Lidocaine 5%</option>
+        </select>
+      </div>
+      <div class="form-row"><span class="row-lbl">รับจาก</span><input class="row-inp" type="text" name="receivedFrom" placeholder="OR / Endoscopy"></div>
+    </div>
+
+    <div class="spinal-box" id="spinalBox" style="display:none;">
+      <div class="spinal-title">🦵 Spinal Block Regression Reference</div>
+      <div class="spinal-row"><span class="spinal-key">ยา / Level</span><span class="spinal-val" id="spinalSummary">—</span></div>
+      <div class="spinal-row"><span class="spinal-key">Motor block หายใน</span><span class="spinal-val" id="spinalMotor">—</span></div>
+      <div class="spinal-row"><span class="spinal-key">Sensory regression</span><span class="spinal-val" id="spinalSensory">—</span></div>
+      <div class="spinal-row"><span class="spinal-key">หมายเหตุ</span><span class="spinal-val" id="spinalNote" style="font-size:10px;">—</span></div>
+    </div>
+
+    <div class="section-hdr">04 — การประเมิน PACU (แยกตามเวลา)</div>
+    <div class="tl-wrap">
+      <div class="tl-scroll">
+        <table class="grid-table" id="assessTable"></table>
+      </div>
+    </div>
+    <div class="assess-legend">✓ = พบ/ปกติ · − = ไม่มี · กดสลับได้</div>
+    <div class="card">
+      <div class="form-row" style="align-items:flex-start;padding-top:10px;">
+        <textarea name="otherNote" rows="3" placeholder="บันทึกเพิ่มเติม..." style="width:100%;background:transparent;border:none;outline:none;font-family:var(--font);font-size:14px;color:var(--text);resize:none;min-height:56px;"></textarea>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px 4px;">
+      <div class="section-hdr" style="padding:0;">บันทึกการพยาบาล</div>
+      <button type="button" class="act-btn ghost" id="addNoteBtn" style="width:auto;padding:5px 11px;font-size:12px;border-radius:8px;">+ เพิ่ม</button>
+    </div>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="sub-panel" id="sub-timeline">
+    <div class="section-hdr">02 — Vital Signs + Aldrete Timeline</div>
+    <div class="ai-bar">
+      <button type="button" class="ai-btn scan" id="openScanModal">📷 สแกน Monitor</button>
+      <button type="button" class="ai-btn ekg" id="openEkgModal">🫀 วิเคราะห์ EKG</button>
+    </div>
+    <div class="tl-wrap">
+      <div class="tl-scroll">
+        <table class="grid-table" id="gridTable"></table>
+      </div>
+    </div>
+    <div class="chart-wrap">
+      <h3>แนวโน้มสัญญาณชีพ</h3>
+      <div class="chart-legend">
+        <span class="lgnd"><i class="lgnd-dot" style="background:#3A7BD5"></i>SBP</span>
+        <span class="lgnd"><i class="lgnd-dot" style="background:#2EBD6B"></i>HR</span>
+        <span class="lgnd"><i class="lgnd-dot" style="background:#FF9500"></i>SpO₂</span>
+        <span class="lgnd"><i class="lgnd-dot" style="background:#FF3B30"></i>Pain</span>
+        <span class="lgnd"><i class="lgnd-dot" style="background:#7B5EA7"></i>Aldrete</span>
+      </div>
+      <div style="position:relative;height:180px;width:100%;"><canvas id="vitalChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- SCORES -->
+  <div class="sub-panel" id="sub-scores">
+    <div class="section-hdr">03 — PADSS (ความพร้อมกลับบ้าน — เฉพาะ OPD)</div>
+    <div class="info-note" id="padssIPDNote" style="display:none;">ผู้ป่วย IPD ใช้เกณฑ์ Modified Aldrete (กรอกในแท็บ Timeline) — ไม่ต้องประเมิน PADSS</div>
+    <div class="score-wrap open" id="padssWrap" style="display:none;">
+      <button type="button" class="score-hdr-btn" onclick="toggleScore('padssWrap')">
+        <div class="score-hdr-left"><h3>PADSS Score</h3><p>ประเมินความพร้อมกลับบ้าน (OPD เท่านั้น)</p></div>
+        <div class="score-hdr-right">
+          <div class="score-total good" id="padssTotal">10</div>
+          <svg class="score-chevron" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </button>
+      <div class="score-body">
+        <div class="score-bar-wrap"><div class="score-bar"><div class="score-fill good" id="padssFill" style="width:100%"></div></div><div class="score-status-lbl good" id="padssStatus">พร้อมจำหน่าย</div></div>
+        <div class="criteria" id="padssFields"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRUGS -->
+  <div class="sub-panel" id="sub-drugs">
+    <div class="section-hdr">💊 ยาที่ได้รับใน PACU</div>
+    <div id="drugList"></div>
+    <button type="button" class="add-btn" id="addDrugBtn">+ เพิ่มยา</button>
+    <div id="drugMonBox" style="display:none;">
+      <div class="section-hdr" style="color:var(--orange);">⚠️ Drug Monitoring Protocol</div>
+      <div class="drug-monitor-box">
+        <div class="drug-monitor-title">สิ่งที่ต้องติดตาม (อ้างอิง ASA/WFSA/RCAT)</div>
+        <div id="drugMonList"></div>
+      </div>
+    </div>
+    <div class="section-hdr" style="margin-top:8px;">💧 สารน้ำที่ได้รับ (IV Fluids)</div>
+    <div id="fluidList"></div>
+    <button type="button" class="add-btn" id="addFluidBtn">+ เพิ่มสารน้ำ</button>
+  </div>
+
+  <!-- DISCHARGE -->
+  <div class="sub-panel" id="sub-dc">
+    <div class="section-hdr">05 — สรุปการจำหน่าย</div>
+    <div class="sum-grid">
+      <div class="sum-box"><div class="sum-box-lbl">Aldrete</div><div class="sum-box-val good" id="sumA">10/10</div></div>
+      <div class="sum-box" id="sumPBox" style="display:none;"><div class="sum-box-lbl">PADSS</div><div class="sum-box-val good" id="sumP">10/10</div></div>
+    </div>
+    <div class="sum-card" id="summaryPanel"></div>
+    <div class="card" style="margin-top:8px;">
+      <div class="form-row"><span class="row-lbl">เวลาจำหน่าย</span><input class="row-inp" type="time" name="timeDischarge"></div>
+      <div class="form-row"><span class="row-lbl">พยาบาล</span><input class="row-inp" type="text" name="dischargeNurse" placeholder="ชื่อพยาบาล"></div>
+      <div class="form-row">
+        <span class="row-lbl">ส่งไปยัง</span>
+        <select class="row-inp" name="dischargeDestination">
+          <option>หอผู้ป่วยทั่วไป</option><option>ICU</option><option>ห้องผ่าตัด</option><option>กลับบ้าน</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:12px;">
+      <button type="button" class="act-btn primary" id="saveBtn">💾 บันทึกลง Google Sheets</button>
+      <button type="button" class="act-btn ghost" id="exportBtn">🖨️ พิมพ์ / ส่งออก PDF</button>
+      <button type="button" class="act-btn danger" id="dischargeBtn">จำหน่ายผู้ป่วย</button>
+      <p class="save-msg" id="saveState">พร้อมบันทึก</p>
+    </div>
+  </div>
+
+  </form>
+</div><!-- /tab-record -->
+
+<!-- ═══ ALERTS ═══ -->
+<div class="tab-page" id="tab-alerts">
+  <p class="page-title">Alerts</p>
+  <p class="page-sub">สัญญาณเตือนที่ต้องดำเนินการ — เรียงตามความเร่งด่วน</p>
+  <div id="alertsCenter" style="padding:0 16px;"></div>
+  <div id="alertsEmpty" style="display:none;text-align:center;padding:40px 20px;color:var(--text-3);">
+    <div style="font-size:36px;margin-bottom:8px;">✅</div>
+    <div style="font-size:14px;">ไม่มีสัญญาณเตือนขณะนี้</div>
+  </div>
+</div>
+
+<!-- ═══ REPORTS ═══ -->
+<div class="tab-page" id="tab-reports">
+  <p class="page-title">รายงาน</p>
+  <p class="page-sub">สรุปการดำเนินงานห้องพักฟื้น</p>
+  <div class="metrics-row" style="margin-bottom:14px;">
+    <div class="metric-box"><div class="m-num blue" id="rpTotal">0</div><div class="m-lbl">ในห้องพักฟื้น</div></div>
+    <div class="metric-box"><div class="m-num green" id="rpStable">0</div><div class="m-lbl">คงที่</div></div>
+    <div class="metric-box"><div class="m-num orange" id="rpReassess">0</div><div class="m-lbl">รอประเมิน</div></div>
+    <div class="metric-box"><div class="m-num red" id="rpReview">0</div><div class="m-lbl">แจ้งแพทย์</div></div>
+  </div>
+  <div class="section-hdr">ตัวชี้วัดทางคลินิก</div>
+  <div class="sum-card" id="reportMetrics"></div>
+  <div class="section-hdr">ผู้ป่วยทั้งหมดในเวร</div>
+  <div class="sum-card" id="reportRoster"></div>
+</div>
+
+<!-- ═══ COMPLICATIONS ═══ -->
+<div class="tab-page" id="tab-ekg">
+  <p class="page-title">EKG & Knowledge</p>
+  <p class="page-sub">คู่มือ rhythm, ภาวะแทรกซ้อน และเอกสารอ้างอิง</p>
+  <div class="ai-bar" style="margin-bottom:10px;"><button type="button" class="ai-btn ekg" id="openEkgModal2" style="flex:1;">🫀 วิเคราะห์ EKG ด้วย AI</button></div>
+  <div class="section-hdr">ภาวะแทรกซ้อนที่ต้องเฝ้าระวัง</div>
+  <div class="comp-card" id="compList"></div>
+  <div class="section-hdr" style="margin-top:4px;">EKG Patterns — ระดับความเร่งด่วน</div>
+  <div style="padding:0 16px 10px;"><div id="ekgPatterns"></div></div>
+  <div class="section-hdr" style="margin-top:8px;">เอกสารอ้างอิง</div>
+  <div class="ref-card">
+    <div class="ref-item"><div class="ref-num">[1]</div><div class="ref-title">แนวทางพัฒนาการระงับปวดเฉียบพลันหลังผ่าตัด — เครือข่ายวิสัญญีไทย</div><div class="ref-meta">Thai Journal of Anesthesiology 2020;46(4):5–62.</div><span class="ref-badge thai">ไทย 2020</span></div>
+    <div class="ref-item"><div class="ref-num">[2]</div><div class="ref-title">ราชวิทยาลัยวิสัญญีแพทย์ฯ — แนวทางป้องกันและรักษา PONV</div><div class="ref-meta">RCAT. พ.ศ. 2564.</div><span class="ref-badge thai">ไทย 2021</span></div>
+    <div class="ref-item"><div class="ref-num">[3]</div><div class="ref-title">PROSPECT: Laparoscopic hysterectomy pain management</div><div class="ref-meta">Reg Anesth Pain Med. 2019.</div><span class="ref-badge guideline">PROSPECT</span></div>
+    <div class="ref-item"><div class="ref-num">[4]</div><div class="ref-title">ERAS Society Guidelines for Gynecologic/Oncology Surgery</div><div class="ref-meta">Int J Gynecol Cancer. 2019 + 2023 update.</div><span class="ref-badge guideline">ERAS</span></div>
+    <div class="ref-item"><div class="ref-num">[5]</div><div class="ref-title">ASA Standards for Postanesthesia Care</div><div class="ref-meta">American Society of Anesthesiologists. Revised 2019.</div><span class="ref-badge guideline">ASA</span></div>
+    <div class="ref-item"><div class="ref-num">[6]</div><div class="ref-title">ESAIC Fourth Consensus Guidelines for PONV Management</div><div class="ref-meta">Eur J Anaesthesiol. 2020.</div><span class="ref-badge guideline">ESAIC</span></div>
+    <div class="ref-item"><div class="ref-num">[7]</div><div class="ref-title">Association of Anaesthetists — Immediate post-anaesthesia recovery</div><div class="ref-meta">Anaesthesia. 2021.</div><span class="ref-badge review">AA Guideline</span></div>
+    <div class="ref-item"><div class="ref-num">[8]</div><div class="ref-title">ACC/AHA/HRS Bradycardia and Conduction Delay Guideline</div><div class="ref-meta">JACC. 2018.</div><span class="ref-badge review">ACC/AHA</span></div>
+    <div class="ref-item"><div class="ref-num">[9]</div><div class="ref-title">ESC Guidelines on Ventricular Arrhythmias / SCD Prevention</div><div class="ref-meta">Eur Heart J. 2022.</div><span class="ref-badge review">ESC 2022</span></div>
+    <div class="ref-item"><div class="ref-num">[10]</div><div class="ref-title">Cardiovascular Consequences of Laparoscopic Surgery</div><div class="ref-meta">Circulation. 2017;135(7):700–710.</div><span class="ref-badge review">Evidence</span></div>
+  </div>
+</div><!-- /tab-ekg -->
+
+</div><!-- /app-wrap -->
+
+<nav class="bottom-nav">
+  <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="6" rx="1.5"/><rect x="14" y="14" width="7" height="6" rx="1.5"/></svg>
+    <span>ผู้ป่วย</span>
+  </button>
+  <button class="nav-tab" data-tab="alerts" onclick="switchTab('alerts')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="nav-badge-wrap">Alerts<i class="nav-dot" id="navAlertDot" style="display:none;"></i></span>
+  </button>
+  <button class="nav-tab" data-tab="reports" onclick="switchTab('reports')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18" stroke-linecap="round"/><rect x="7" y="11" width="3" height="6" rx="1"/><rect x="13" y="7" width="3" height="10" rx="1"/></svg>
+    <span>รายงาน</span>
+  </button>
+  <button class="nav-tab" data-tab="ekg" onclick="switchTab('ekg')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12h4l2-6 4 12 2-6h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span>EKG</span>
+  </button>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="intakeModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="modal-hdr"><h2>รับผู้ป่วยใหม่</h2><button class="modal-close" onclick="closeModal('intakeModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="section-hdr" style="padding-left:0;">ประเภทผู้ป่วย</div>
+      <div class="intake-type">
+        <button type="button" id="itIPD" class="on" onclick="setIntakeType('IPD')">🏥 IPD (ผู้ป่วยใน)</button>
+        <button type="button" id="itOPD" onclick="setIntakeType('OPD')">🏃 OPD / Day Case</button>
+      </div>
+      <div class="intake-form">
+        <div class="intake-row"><label>เตียง / Bed</label><input type="text" id="itBed" placeholder="เช่น 1, 2, 3"></div>
+        <div class="intake-row"><label>ชื่อ-สกุล</label><input type="text" id="itName" placeholder="ชื่อผู้ป่วย"></div>
+        <div class="intake-row"><label>HN</label><input type="text" id="itHN" placeholder="HN000000"></div>
+        <div class="intake-row"><label>วันที่ผ่าตัด</label><input type="date" id="itDate"></div>
+        <div class="intake-row"><label>เวลาแรกรับ</label><input type="time" id="itArrival"></div>
+        <div class="intake-row bp-row"><label>Baseline BP</label><input type="number" id="itSBP" placeholder="SBP"><span style="color:var(--text-3);">/</span><input type="number" id="itDBP" placeholder="DBP"></div>
+        <div class="intake-row"><label>การผ่าตัด</label><input type="text" id="itOp" placeholder="ชื่อหัตถการ"></div>
+        <div class="intake-row"><label>Surgeon</label><input type="text" id="itSurgeon" placeholder="ศัลยแพทย์"></div>
+        <div class="intake-row"><label>แพทย์วิสัญญี</label><input type="text" id="itAnes" placeholder="วิสัญญีแพทย์"></div>
+        <div class="intake-row"><label>วิธีระงับความรู้สึก</label>
+          <select id="itTech"><option>GA (ยาสลบทั่วไป)</option><option>Spinal block</option><option>Epidural</option><option>MAC</option><option>Local anesthesia</option></select>
+        </div>
+        <div class="intake-row"><label>รับจากห้อง</label><input type="text" id="itFrom" placeholder="OR / Endoscopy"></div>
+      </div>
+      <button type="button" class="intake-go" id="intakeGo">เริ่มบันทึก →</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scanModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="modal-hdr"><h2>📷 สแกน Monitor</h2><button class="modal-close" onclick="closeModal('scanModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone"><input type="file" accept="image/*" capture="environment" id="scanFileInput"><div class="upload-icon">📱</div><div class="upload-title">ถ่ายหรืออัปโหลดภาพ Monitor</div><div class="upload-sub">Mindray · Philips · GE · Draeger</div><img class="upload-preview" id="scanPreview" alt="preview"></div>
+      <div class="ai-result" id="scanResult"><div class="ai-thinking" id="scanThinking" style="display:none;"><div class="spin"></div><span>AI กำลังวิเคราะห์...</span></div><div id="scanOutput"></div></div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="ekgModal">
+  <div class="modal-sheet"><div class="modal-handle"></div>
+    <div class="modal-hdr"><h2>🫀 วิเคราะห์ EKG</h2><button class="modal-close" onclick="closeModal('ekgModal')">✕</button></div>
+    <div class="modal-body">
+      <div class="upload-zone"><input type="file" accept="image/*" capture="environment" id="ekgFileInput"><div class="upload-icon">📈</div><div class="upload-title">ถ่ายหรืออัปโหลด EKG Strip</div><div class="upload-sub">AI วิเคราะห์ Rhythm, Rate, ความผิดปกติ</div><img class="upload-preview" id="ekgPreview" alt="preview"></div>
+      <div class="ai-result" id="ekgResult"><div class="ai-thinking" id="ekgThinking" style="display:none;"><div class="spin"></div><span>AI กำลังวิเคราะห์...</span></div><div id="ekgOutput"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRINT -->
+<div class="print-doc" id="printDoc">
+  <div class="print-full p-hdr"><div><div class="p-logo">🫀 PACU Ready AI v4</div><div class="p-hdr-title">บันทึกการดูแลผู้ป่วยในห้องพักฟื้น</div></div><div id="p-status-badge"></div></div>
+  <div class="p-sec"><div class="p-sec-title">ข้อมูลผู้ป่วย</div><div id="p-pt"></div></div>
+  <div class="p-sec"><div class="p-sec-title">การผ่าตัดและการระงับความรู้สึก</div><div id="p-op"></div></div>
+  <div class="print-full p-sec"><div class="p-sec-title">Vital Signs + Aldrete Timeline</div><table class="p-table" id="p-tl"></table></div>
+  <div class="p-sec"><div class="p-sec-title">Modified Aldrete Score</div><div id="p-ald"></div></div>
+  <div class="p-sec" id="p-padss-sec"><div class="p-sec-title">PADSS Score</div><div id="p-padss"></div></div>
+  <div class="p-sec"><div class="p-sec-title">ยาที่ได้รับใน PACU</div><div id="p-drugs"></div></div>
+  <div class="p-sec"><div class="p-sec-title">สารน้ำ (IV Fluids)</div><div id="p-fluids"></div></div>
+  <div class="p-sec"><div class="p-sec-title">การประเมิน PACU</div><div id="p-assess"></div></div>
+  <div class="print-full p-sec"><div class="p-sec-title">สรุปการจำหน่าย</div><div id="p-dc"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8mm;margin-top:5mm;">
+      <div class="p-sign">ลายเซ็นพยาบาลห้องพักฟื้น</div><div class="p-sign">ลายเซ็นวิสัญญีแพทย์</div><div class="p-sign">วันที่ / เวลา</div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<!-- Inline JS from app.html -->
+<script>
+'use strict';
+/* แปลงไฟล์รูป → base64 (ตัด prefix data:...;base64, ออก) */
+function fileToBase64(file){
+ return new Promise(function(resolve,reject){
+  const r=new FileReader();
+  r.onload=function(){const s=r.result;const c=s.indexOf(',');resolve(s.substring(c+1));};
+  r.onerror=reject;
+  r.readAsDataURL(file);
+ });
+}
+
+/* ══ DATA ══ */
+const ALDRETE=[
+  {key:'activity',label:'การเคลื่อนไหว (Activity)',opts:[{v:0,l:'0 — เคลื่อนไหวไม่ได้'},{v:1,l:'1 — ขยับได้ 2 แขน/ขา'},{v:2,l:'2 — ขยับได้ครบ 4 แขน/ขา'}]},
+  {key:'respiration',label:'การหายใจ (Respiration)',opts:[{v:0,l:'0 — หยุดหายใจ'},{v:1,l:'1 — หายใจตื้น/หอบ'},{v:2,l:'2 — หายใจลึก ไอได้เอง'}]},
+  {key:'circulation',label:'ระบบไหลเวียนเลือด (BP)',autoKey:true,opts:[{v:0,l:'0 — BP ±50% จาก baseline'},{v:1,l:'1 — BP ±20–49% จาก baseline'},{v:2,l:'2 — BP ±20% จาก baseline'}]},
+  {key:'consciousness',label:'ความรู้สึกตัว',opts:[{v:0,l:'0 — ไม่ตอบสนอง'},{v:1,l:'1 — ตื่นเมื่อเรียก'},{v:2,l:'2 — ตื่นตัวสมบูรณ์'}]},
+  {key:'oxygenation',label:'ออกซิเจน (SpO₂)',opts:[{v:0,l:'0 — SpO₂ < 90% แม้ให้ O₂'},{v:1,l:'1 — ต้องการ O₂ เพื่อรักษา ≥90%'},{v:2,l:'2 — SpO₂ ≥ 92% หายใจเองในอากาศ'}]},
+];
+const PADSS=[
+  {key:'vitalSigns',label:'สัญญาณชีพ',opts:[{v:0,l:'0 — ±40% จาก baseline'},{v:1,l:'1 — ±20–39% จาก baseline'},{v:2,l:'2 — ±20% จาก baseline'}]},
+  {key:'ambulation',label:'การเดิน',opts:[{v:0,l:'0 — เดินไม่ได้/วิงเวียน'},{v:1,l:'1 — ต้องช่วยประคอง'},{v:2,l:'2 — เดินได้ตรง ไม่วิงเวียน'}]},
+  {key:'nauseaVomiting',label:'คลื่นไส้/อาเจียน',opts:[{v:0,l:'0 — รุนแรง'},{v:1,l:'1 — ปานกลาง ให้ยาแล้วดีขึ้น'},{v:2,l:'2 — น้อยมาก/ไม่มี'}]},
+  {key:'pain',label:'ความปวด',opts:[{v:0,l:'0 — ปวดมาก ควบคุมไม่ได้'},{v:1,l:'1 — ปวดปานกลาง'},{v:2,l:'2 — ปวดน้อย/รับได้'}]},
+  {key:'surgicalBleeding',label:'เลือดออกจากแผล',opts:[{v:0,l:'0 — มาก ต้องรักษา'},{v:1,l:'1 — เปลี่ยนผ้า 2 ครั้ง'},{v:2,l:'2 — น้อย เปลี่ยนผ้า 1 ครั้ง'}]},
+];
+const TL_MINS=[15,30,45,60,90,120];
+const SPINAL={
+ 'Heavy Bupivacaine 0.5%':{T4:{motor:'3–4 ชม.',sensory:'4–6 ชม.',note:'High block ระวัง respiratory compromise'},T6:{motor:'2.5–3.5 ชม.',sensory:'3.5–5 ชม.',note:'ระวัง hypotension'},T10:{motor:'2–3 ชม.',sensory:'3–4 ชม.',note:'Lower abdominal surgery'},L1:{motor:'1.5–2.5 ชม.',sensory:'2.5–3.5 ชม.',note:'Lower limb motor block'},'L2':{motor:'1.5–2.5 ชม.',sensory:'2.5–3.5 ชม.',note:''},'L3-4':{motor:'1–2 ชม.',sensory:'2–3 ชม.',note:'Motor block หายเร็ว'}},
+ 'Plain Bupivacaine 0.5%':{T4:{motor:'2.5–3.5 ชม.',sensory:'3.5–5 ชม.',note:'Spread ไม่คาดเดาได้ใน Trendelenburg'},T6:{motor:'2–3 ชม.',sensory:'3–4 ชม.',note:''},T10:{motor:'1.5–2.5 ชม.',sensory:'2.5–3.5 ชม.',note:''},L1:{motor:'1–2 ชม.',sensory:'2–3 ชม.',note:''},L2:{motor:'1–2 ชม.',sensory:'2–3 ชม.',note:''},'L3-4':{motor:'45–90 นาที',sensory:'1.5–2.5 ชม.',note:''}},
+ 'Lidocaine 5%':{T4:{motor:'1–1.5 ชม.',sensory:'1.5–2 ชม.',note:'Short procedure'},T6:{motor:'1–1.5 ชม.',sensory:'1.5–2 ชม.',note:''},T10:{motor:'45–75 นาที',sensory:'1–1.5 ชม.',note:''},L1:{motor:'45–60 นาที',sensory:'1–1.5 ชม.',note:''},L2:{motor:'45–60 นาที',sensory:'1–1.5 ชม.',note:''},'L3-4':{motor:'30–45 นาที',sensory:'45–75 นาที',note:'หายเร็วมาก'}},
+};
+const FLUID_LIST=['NSS (0.9% NaCl)','RLS (Ringer\'s lactate)','Acetar','5% D/W','5% D/N/2','5% D/NSS','Hartmann','Colloid (Voluven/Gelofusine)','PRC (เลือด)','FFP','Platelet','อื่นๆ'];
+const DRUG_LIST=['Morphine','Pethidine','Fentanyl','Tramadol','Ondansetron','Metoclopramide','Dexamethasone','Ephedrine','Phenylephrine','Atropine','Neostigmine','Sugammadex','Midazolam','Ketorolac','Paracetamol IV','Diclofenac','Oxytocin','Ergometrine','อื่นๆ'];
+const DPROT={
+ Morphine:{iv:15,items:['Monitor RR ทุก 15 นาที (เป้าหมาย ≥10 bpm)','Monitor SpO₂ ต่อเนื่อง ≥95%','ประเมิน Sedation score ทุก 15 นาที','เตรียม Naloxone ไว้ใกล้มือ','RR<10 หรือ SpO₂<90% → รายงานวิสัญญีแพทย์ทันที']},
+ Pethidine:{iv:15,items:['Monitor RR ทุก 15 นาที','Monitor SpO₂','ระวัง Seizure ถ้า cumulative dose สูง','เตรียม Naloxone']},
+ Fentanyl:{iv:15,items:['Monitor RR ทุก 15 นาที','Monitor SpO₂ ต่อเนื่อง','ระวัง Chest wall rigidity (dose สูง)','เตรียม Naloxone']},
+ Tramadol:{iv:30,items:['Monitor คลื่นไส้/อาเจียน','Monitor ระดับความปวด']},
+ Ephedrine:{iv:5,items:['Monitor BP ทุก 5 นาที จนกว่า hemodynamic stable','เป้าหมาย SBP ±20% จาก baseline','Monitor HR']},
+ Phenylephrine:{iv:5,items:['Monitor BP ทุก 5 นาที','ระวัง Reflex bradycardia','Monitor HR ควบคู่']},
+ Atropine:{iv:5,items:['Monitor HR ทุก 5 นาที','ระวัง Tachycardia']},
+ Neostigmine:{iv:15,items:['Head lift 5 วินาที + Grip strength','Monitor RR และ SpO₂','ระวัง Bradycardia และ PONV']},
+ Sugammadex:{iv:15,items:['ประเมิน TOF ratio หลังให้','Monitor airway และ respiratory','ระวัง Bradycardia + Hypersensitivity']},
+ Midazolam:{iv:15,items:['Monitor Sedation score','Monitor RR และ SpO₂','เตรียม Flumazenil ไว้ใกล้มือ']},
+ Ondansetron:{iv:15,items:['ระวัง QT prolongation — Monitor QTc ถ้าให้ร่วมกับยาอื่นที่ยืด QT','ห้ามให้ถ้า QTc > 500 ms','แจ้งแพทย์ถ้ามี palpitation / dizziness หลังให้']},
+ Oxytocin:{iv:5,items:['Monitor BP ทุก 5 นาที (ระวัง Hypotension ถ้า IV bolus)','Monitor HR','Monitor uterine contraction']},
+ Ergometrine:{iv:5,items:['Monitor BP ทุก 5 นาที (ระวัง Hypertension)','Monitor HR','ห้ามใช้ใน PIH / Pre-eclampsia']},
+};
+const COMPLICATIONS=[
+ {icon:'🫁',title:'Airway obstruction / Respiratory depression',signs:'เสียงดัง effort สูง SpO₂ลด ซึม หายใจตื้น หยุดหายใจ',action:'ABC, jaw thrust/suction/airway adjunct, O₂ 100%, ประเมิน residual opioid/paralysis, พิจารณา Naloxone/reversal'},
+ {icon:'🩸',title:'เลือดออก / Hemoperitoneum',signs:'BP ต่ำ HR เร็ว ท้องโต/กดเจ็บ Hb ลด ปวดไม่สัมพันธ์',action:'Large-bore IV, crossmatch, fluid/blood resuscitation, แจ้งศัลยแพทย์ทันที, พิจารณา bedside US / กลับ OR'},
+ {icon:'🤢',title:'PONV รุนแรง / Ileus',signs:'คลื่นไส้อาเจียนมาก ดื่มไม่ได้ ท้องอืด ไม่ผายลม',action:'Rescue antiemetic ต่างกลุ่มจาก prophylaxis, แก้ dehydration, ลด opioid, ถ้าท้องอืด/อาเจียน bile-stained → คิดถึง obstruction'},
+ {icon:'💨',title:'PE / DVT',signs:'หอบ เจ็บอก tachycardia SpO₂ลด ขาบวมปวด',action:'O₂, แจ้งแพทย์, ECG/ABG, ทบทวน prophylaxis ที่พลาด, ประสาน imaging/anticoagulation'},
+ {icon:'🚰',title:'ปัสสาวะน้อย / Urinary retention',signs:'ปัสสาวะ <0.5 ml/kg/h, ปวด bladder, hematuria',action:'Fluid balance, bladder scan, ตรวจ catheter patency, ถ้ามี hematuria หรือ disproportionate oliguria → แจ้งศัลยแพทย์'},
+ {icon:'🌡️',title:'ไข้สูง / SSI',signs:'Temp >38.5°C, แผลบวมแดงหนอง, sepsis signs',action:'ประเมิน source, culture, antibiotics ตามข้อบ่งชี้, ถ้า Temp >39.5°C เฉียบพลันหลัง GA → ระวัง Malignant Hyperthermia'},
+ {icon:'🧠',title:'ภาวะแทรกซ้อน neuraxial',signs:'ปวดหลังมาก ชา/อ่อนแรงใหม่ หลัง neuraxial block',action:'EMERGENCY: หยุด anticoagulant ที่ไม่จำเป็น, neuro exam ซ้ำ, urgent imaging/neurosurgery ตาม protocol'},
+];
+const EKG_PATTERNS=[
+ {level:'immediate',label:'🔴 IMMEDIATE — แจ้งทันที',items:[
+  {p:'STEMI / Occlusion equivalent',a:'Activate reperfusion pathway ทันที — serial ECG + right/posterior leads'},
+  {p:'Hyperacute T waves (regional)',a:'สงสัย evolving occlusion — serial ECG ทุก 5 นาที จนแน่ใจ'},
+  {p:'Mobitz II / Complete Heart Block (CHB)',a:'เตรียม pacing pads, Atropine (จำกัดผล), แจ้งแพทย์ทันที'},
+  {p:'Torsades de Pointes (TdP)',a:'IV Magnesium, หยุดยา QT-prolonging, correct K/Mg, พิจารณา overdrive pacing'},
+  {p:'Hyperkalemia รุนแรง (peaked T, QRS กว้าง, sine wave)',a:'IV Calcium, Insulin/Glucose, พิจารณา Dialysis — stat K+'},
+  {p:'Brugada type 1 + syncope/fever',a:'Monitor, หยุด Na-channel blockers, ลดไข้ทันที, แจ้งแพทย์'},
+  {p:'Pre-excited AF (WPW + AF) — irregular wide-complex rapid',a:'ห้าม AV nodal blockers — พิจารณา DC cardioversion หรือ Procainamide'},
+ ]},
+ {level:'urgent',label:'🟡 URGENT — แจ้งไม่กี่นาที',items:[
+  {p:'NSTEMI / ischemic ST-T changes ใหม่',a:'Serial ECG + Troponin + Telemetry — ถ้ายังเจ็บหน้าอก → escalate เป็น immediate'},
+  {p:'New LBBB (ใหม่ + อาการ ischemia)',a:'Manage as high-risk ACS จนพิสูจน์ได้ว่าไม่ใช่'},
+  {p:'SVT stable',a:'12-lead ระหว่าง rhythm, vagal manoeuvre, Adenosine ตาม protocol'},
+  {p:'AF / Atrial flutter stable',a:'ประเมิน rate, instability, anticoag context — ถ้า unstable → immediate'},
+  {p:'Long QT (QTc ≥480 ms)',a:'หยุดยา QT-prolonging, correct K/Mg/Ca, Telemetry'},
+  {p:'Bradycardia หลัง Laparoscopy (HR <55 + GA)',a:'อาจเกิดจาก CO₂ vagal reflex — ถ้า HR <50 → escalate immediate (Ref: Korean J Anesth 2013)'},
+  {p:'Ondansetron + QTc ยืด',a:'ตรวจ QTc ก่อนให้ยา, หลีกเลี่ยงถ้า QTc >500 ms หรือมียา QT-prolonging อื่น (RCAT 2564)'},
+ ]},
+ {level:'routine',label:'🟢 ROUTINE — บันทึกและติดตาม',items:[
+  {p:'Sinus arrhythmia (physiological)',a:'เทียบ ECG เดิม — มัก benign ในคนอายุน้อย'},
+  {p:'Isolated PAC / PVC ไม่มีอาการ',a:'ตรวจ electrolytes และ O₂ — ถ้าถี่มาก/multifocal ให้ยกระดับ'},
+  {p:'First-degree AV block (คงเดิม)',a:'Review ยา — ถ้าใหม่ร่วม MI/drug toxicity ให้ urgent'},
+  {p:'Known paced rhythm (capture ปกติ)',a:'เทียบ prior ECG — ถ้า capture failure/ischemia ให้ urgent/immediate'},
+ ]},
+];
+
+/* ══ STATE ══ */
+const S={
+ vitals:[],         // [{sbp,dbp,pulse,rr,spo2,temp,pain}] index = timepoint 0–5
+ aldretePerTP:[],  // per timepoint Aldrete
+ assess:[],         // per timepoint PACU assessment
+ aS:{},pS:{},      // current manual score (for scores tab)
+ patients:[],chart:null,currentRecordId:null,
+ type:'IPD',opType:'lap',
+ arr:null,tI:null,cI:null,
+ drugs:[],fluids:[],bSBP:null,bDBP:null,
+};
+ALDRETE.forEach(c=>S.aS[c.key]=2);
+// PADSS starts empty — nurse fills it
+for(let i=0;i<6;i++){S.aldretePerTP.push({});}
+S.assess=[];for(let i=0;i<6;i++){S.assess.push({});}
+
+/* ══ TIME HELPERS ══ */
+const nt=()=>{const n=new Date();return pad(n.getHours())+':'+pad(n.getMinutes());};
+const pad=n=>String(n).padStart(2,'0');
+function slotTime(i){
+ if(!S.arr)return '--:--';
+ const d=new Date(S.arr.getTime()+TL_MINS[i]*60000);
+ return pad(d.getHours())+':'+pad(d.getMinutes());
+}
+var ALD_KEYS=['activity','respiration','circulation','consciousness','oxygenation'];
+function aldreteScore(tp){
+ const a=S.aldretePerTP[tp]||{};
+ return ALD_KEYS.reduce(function(s,k){return s+(typeof a[k]==='number'?a[k]:0);},0);
+}
+function aldreteComplete(tp){
+ const a=S.aldretePerTP[tp]||{};
+ return ALD_KEYS.every(function(k){return typeof a[k]==='number';});
+}
+function aldreteAny(tp){
+ const a=S.aldretePerTP[tp]||{};
+ return ALD_KEYS.some(function(k){return typeof a[k]==='number';});
+}
+
+/* ══ NAV ══ */
+function switchTab(t){
+ document.querySelectorAll('.tab-page').forEach(p=>p.classList.remove('active'));
+ document.querySelectorAll('.nav-tab').forEach(b=>b.classList.remove('active'));
+ document.getElementById('tab-'+t).classList.add('active');
+ var nb=document.querySelector('[data-tab="'+t+'"]');if(nb)nb.classList.add('active');
+ if(t==='overview')loadCommandCenter();
+ if(t==='alerts')renderAlertsCenter();
+ if(t==='reports')renderReports();
+ window.scrollTo(0,0);
+}
+function switchSub(n){
+ document.querySelectorAll('.sub-panel').forEach(p=>p.classList.remove('active'));
+ document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+ document.getElementById('sub-'+n).classList.add('active');
+ document.querySelector('[data-sub="'+n+'"]').classList.add('active');
+ if(n==='timeline'&&!S.chart)initChart();
+}
+function toggleScore(id){document.getElementById(id).classList.toggle('open');}
+function openModal(id){document.getElementById(id).classList.add('show');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+
+/* ══ TYPE ══ */
+function setType(t){
+ S.type=t;
+ var isO=t==='OPD';
+ ['padssWrap','ssPWrap','sumPBox'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display=isO?'':'none';});
+ var sp=document.getElementById('subPadss');if(sp)sp.style.display=isO?'':'none';
+ var note=document.getElementById('padssIPDNote');if(note)note.style.display=isO?'none':'block';
+ var ind=document.getElementById('typeIndicator');
+ if(ind)ind.innerHTML=(isO?'🏃 OPD / Day Case':'🏥 IPD (ผู้ป่วยใน)')+' — เกณฑ์จำหน่าย: '+(isO?'Aldrete ≥9 + PADSS ≥9':'Aldrete ≥9');
+ var mx=document.getElementById('combinedScore');
+ if(mx&&mx.parentElement.querySelector('.ss-scoremax'))mx.parentElement.querySelector('.ss-scoremax').textContent=isO?'/20':'/10';
+ updateStatus();updateSummary();
+}
+
+/* ══ ANESTHESIA ══ */
+function onAnesthChange(){
+ const v=document.getElementById('anesthTech').value,is=v==='Spinal block';
+ document.getElementById('spinalLevelRow').style.display=is?'flex':'none';
+ document.getElementById('spinalDrugRow').style.display=is?'flex':'none';
+ document.getElementById('spinalBox').style.display=is?'block':'none';
+ if(is)updateSpinalInfo();
+}
+function updateSpinalInfo(){
+ const drug=document.getElementById('spinalDrug').value;
+ const level=document.getElementById('spinalLevel').value;
+ const d=SPINAL[drug]&&SPINAL[drug][level];if(!d)return;
+ document.getElementById('spinalSummary').textContent=drug+' / '+level;
+ document.getElementById('spinalMotor').textContent=d.motor;
+ document.getElementById('spinalSensory').textContent=d.sensory;
+ document.getElementById('spinalNote').textContent=d.note||'—';
+}
+
+/* ══ BASELINE BP → AUTO CIRCULATION ══ */
+function onBPChange(){
+ S.bSBP=parseFloat(document.getElementById('baselineSBP').value)||null;
+ S.bDBP=parseFloat(document.getElementById('baselineDBP').value)||null;
+ autoCircAll();buildAlerts();
+}
+function autoCirc(i){
+ if(!S.bSBP)return;
+ const v=S.vitals[i];if(!v||!v.sbp)return;
+ const pct=Math.abs(parseFloat(v.sbp)-S.bSBP)/S.bSBP*100;
+ const score=pct<20?2:pct<50?1:0;
+ S.aldretePerTP[i].circulation=score;
+}
+function autoCircAll(){for(let i=0;i<6;i++)autoCirc(i);}
+
+/* ══ VITAL RANGES ══ */
+const VR={sbp:{ok:[90,140],w:[80,160]},dbp:{ok:[60,90],w:[50,100]},pulse:{ok:[60,100],w:[50,120]},rr:{ok:[12,20],w:[10,25]},temp:{ok:[36.1,37.5],w:[35.5,38.5]},spo2:{ok:[95,100],w:[90,95]},pain:{ok:[0,3],w:[4,6]}};
+function vCls(k,v){const n=parseFloat(v);if(isNaN(n))return'';const r=VR[k];if(!r)return'';return n>=r.ok[0]&&n<=r.ok[1]?'ok':n>=r.w[0]&&n<=r.w[1]?'warn':'danger';}
+
+/* ══ TIMELINE ══ */
+var EKG_OPTS=['NSR','Sinus brady','Sinus tachy','AF','Atrial flutter','SVT','PVC','VT','1\u00b0 AV block','2\u00b0 AV block','3\u00b0 AV block','Paced','Other'];
+var TL_PARAMS=[['sbp','SBP'],['dbp','DBP'],['pulse','Pulse (HR)'],['rr','RR'],['spo2','SpO\u2082'],['temp','Temp'],['pain','Pain'],['ekg','EKG rhythm']];
+var ALD_ROWS=[['activity','Activity'],['respiration','Respiration'],['circulation','Circulation (auto)'],['consciousness','Consciousness'],['oxygenation','Oxygen sat']];
+
+function colHeader(){
+ var now=new Date(),arr=S.arr||now,el=Math.round((now-arr)/60000);
+ var h='<thead><tr><th class="corner time-h"></th>';
+ TL_MINS.forEach(function(mins,i){
+  var isCur=el>=(TL_MINS[i-1]||0)&&el<mins;
+  h+='<th class="time-h">'+slotTime(i)+(isCur?'<span class="th-now">\u25b6 now</span>':'')+'</th>';
+ });
+ h+='</tr></thead>';
+ return h;
+}
+function curCol(i){
+ var now=new Date(),arr=S.arr||now,el=Math.round((now-arr)/60000);
+ return el>=(TL_MINS[i-1]||0)&&el<TL_MINS[i];
+}
+
+function buildTimeline(){
+ var t=document.getElementById('gridTable');if(!t)return;
+ var h=colHeader()+'<tbody>';
+ // VITAL SIGNS section
+ h+='<tr class="sec-h"><td colspan="'+(TL_MINS.length+1)+'">VITAL SIGNS</td></tr>';
+ TL_PARAMS.forEach(function(p){
+  var k=p[0];
+  h+='<tr><td class="rlbl">'+p[1]+'</td>';
+  TL_MINS.forEach(function(_,i){
+   var v=S.vitals[i]||{};
+   var cur=curCol(i)?' cur':'';
+   if(k==='ekg'){
+    var ev=v.ekg||'';
+    var eopts='<option value=""'+(ev?'':' selected')+'>\u2013</option>';
+    EKG_OPTS.forEach(function(o){eopts+='<option value="'+o+'"'+(ev===o?' selected':'')+'>'+o+'</option>';});
+    h+='<td class="gcell'+cur+'"><select class="ekgsel'+(ev?'':' empty')+'" data-tp="'+i+'" data-vk="ekg" style="font-size:11px;">'+eopts+'</select></td>';
+   }else{
+    var step=k==='temp'?' step="0.1"':'';
+    h+='<td class="gcell'+cur+'"><input class="'+vCls(k,v[k])+'" type="number"'+step+' value="'+(v[k]||'')+'" data-tp="'+i+'" data-vk="'+k+'" placeholder="\u2014"></td>';
+   }
+  });
+  h+='</tr>';
+ });
+ // ALDRETE section
+ h+='<tr class="sec-h"><td colspan="'+(TL_MINS.length+1)+'">MODIFIED ALDRETE (0\u20132 \u0e15\u0e48\u0e2d\u0e02\u0e49\u0e2d)</td></tr>';
+ ALD_ROWS.forEach(function(r){
+  var key=r[0];
+  h+='<tr><td class="rlbl">'+r[1]+'</td>';
+  TL_MINS.forEach(function(_,i){
+   var a=S.aldretePerTP[i]||{};
+   var cur=curCol(i)?' cur':'';
+   var isAuto=key==='circulation'&&S.bSBP;
+   var hasVal=(typeof a[key]==='number');
+   var opts='<option value=""'+(hasVal?'':' selected')+'>\u2013</option>';
+   [0,1,2].forEach(function(val){opts+='<option value="'+val+'"'+(a[key]===val?' selected':'')+'>'+val+'</option>';});
+   h+='<td class="gcell'+cur+'"><select class="'+(isAuto?'auto':'')+(hasVal?'':' empty')+'" data-tp="'+i+'" data-key="'+key+'">'+opts+'</select></td>';
+  });
+  h+='</tr>';
+ });
+ // TOTAL row
+ h+='<tr class="tot-row"><td class="tl">TOTAL Aldrete</td>';
+ TL_MINS.forEach(function(_,i){
+  h+='<td>'+(aldreteComplete(i)?aldreteScore(i):'\u2013')+'</td>';
+ });
+ h+='</tr>';
+ h+='</tbody>';
+ t.innerHTML=h;
+ buildAssessGrid();
+}
+
+var ASSESS_ROWS=[['dressingDry','\u0e41\u0e1c\u0e25\u0e41\u0e2b\u0e49\u0e07 \u0e44\u0e21\u0e48\u0e0b\u0e36\u0e21'],['shivering','\u0e2b\u0e19\u0e32\u0e27\u0e2a\u0e31\u0e48\u0e19'],['nausea','\u0e04\u0e25\u0e37\u0e48\u0e19\u0e44\u0e2a\u0e49'],['vomiting','\u0e2d\u0e32\u0e40\u0e08\u0e35\u0e22\u0e19'],['agitation','\u0e01\u0e23\u0e30\u0e2a\u0e31\u0e1a\u0e01\u0e23\u0e30\u0e2a\u0e48\u0e32\u0e22'],['urinaryRetention','\u0e1b\u0e31\u0e2a\u0e2a\u0e32\u0e27\u0e30\u0e44\u0e21\u0e48\u0e2d\u0e2d\u0e01'],['shoulderPain','\u0e1b\u0e27\u0e14\u0e44\u0e2b\u0e25\u0e48 (CO\u2082)'],['bloating','\u0e17\u0e49\u0e2d\u0e07\u0e2d\u0e37\u0e14']];
+function buildAssessGrid(){
+ var t=document.getElementById('assessTable');if(!t)return;
+ var h=colHeader()+'<tbody>';
+ ASSESS_ROWS.forEach(function(r){
+  var key=r[0];
+  h+='<tr><td class="rlbl">'+r[1]+'</td>';
+  TL_MINS.forEach(function(_,i){
+   var val=(S.assess[i]&&S.assess[i][key])?1:0;
+   var cur=curCol(i)?' cur':'';
+   h+='<td class="acell'+cur+'"><button type="button" class="'+(val?'yes':'no')+'" data-tp="'+i+'" data-ak="'+key+'">'+(val?'\u2713':'\u2212')+'</button></td>';
+  });
+  h+='</tr>';
+ });
+ h+='</tbody>';
+ t.innerHTML=h;
+}
+
+function setAldrete(i,key,v){
+ if(typeof v!=='number'||isNaN(v)){delete S.aldretePerTP[i][key];}
+ else{S.aldretePerTP[i][key]=v;}
+ const latest=lastCompleteAldrete();
+ if(latest>=0){ALDRETE.forEach(c=>S.aS[c.key]=(typeof S.aldretePerTP[latest][c.key]==='number'?S.aldretePerTP[latest][c.key]:S.aS[c.key]));}
+ refreshTotals();updateStatus();updateSummary();buildAlerts();updateChart();
+}
+function lastCompleteAldrete(){
+ for(var i=5;i>=0;i--){if(aldreteComplete(i))return i;}
+ return -1;
+}
+function setAssess(i,key){
+ if(!S.assess[i])S.assess[i]={};
+ S.assess[i][key]=!S.assess[i][key];
+ buildAssessGrid();
+}
+function refreshNowCol(){
+ // re-highlight current-time column without rebuilding inputs (preserves focus/typing)
+ var now=new Date(),arr=S.arr||now,el=Math.round((now-arr)/60000);
+ ['gridTable','assessTable'].forEach(function(id){
+  var t=document.getElementById(id);if(!t)return;
+  t.querySelectorAll('.gcell,.acell').forEach(function(c){c.classList.remove('cur');});
+  var curIdx=-1;TL_MINS.forEach(function(mins,i){if(el>=(TL_MINS[i-1]||0)&&el<mins)curIdx=i;});
+  if(curIdx<0)return;
+  t.querySelectorAll('tbody tr').forEach(function(tr){
+   var cells=tr.querySelectorAll('.gcell,.acell');
+   if(cells[curIdx])cells[curIdx].classList.add('cur');
+  });
+ });
+}
+function refreshTotals(){
+ // update only TOTAL row cells without full rebuild (keeps selects responsive)
+ var t=document.getElementById('gridTable');if(!t)return;
+ var totRow=t.querySelector('.tot-row');if(!totRow)return;
+ var tds=totRow.querySelectorAll('td');
+ TL_MINS.forEach(function(_,i){
+  if(tds[i+1])tds[i+1].textContent=aldreteComplete(i)?aldreteScore(i):'\u2013';
+ });
+}
+function onTlI(i,k,el){
+ if(!S.vitals[i])S.vitals[i]={};
+ S.vitals[i][k]=el.value;
+ if(k!=='ekg')el.className=vCls(k,el.value);
+ autoCirc(i);
+ // if circulation auto-changed, reflect it in the matching select without full rebuild
+ if(k==='sbp'&&S.bSBP){
+  var sel=document.querySelector('#gridTable select[data-tp="'+i+'"][data-key="circulation"]');
+  if(sel)sel.value=String(S.aldretePerTP[i].circulation);
+ }
+ refreshTotals();updateChart();buildAlerts();updateStatus();updateSummary();
+}
+
+/* ══ CHART ══ */
+function initChart(){const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';s.onload=buildChart;document.head.appendChild(s);}
+function buildChart(){
+ const c=document.getElementById('vitalChart');if(S.chart)S.chart.destroy();
+ const labels=TL_MINS.map((_,i)=>slotTime(i));
+ S.chart=new Chart(c,{type:'line',data:{labels,datasets:[
+  {label:'SBP',data:TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].sbp)||null),borderColor:'#3A7BD5',backgroundColor:'rgba(58,123,213,.06)',tension:.35,pointRadius:4,fill:true},
+  {label:'HR',data:TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].pulse)||null),borderColor:'#2EBD6B',tension:.35,pointRadius:4},
+  {label:'SpO2',data:TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].spo2)||null),borderColor:'#FF9500',tension:.35,pointRadius:4},
+  {label:'Pain',data:TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].pain)||null),borderColor:'#FF3B30',tension:.35,pointRadius:4,borderDash:[4,3]},
+  {label:'Aldrete',data:TL_MINS.map((_,i)=>aldreteComplete(i)?aldreteScore(i):null),borderColor:'#7B5EA7',tension:.35,pointRadius:3,borderDash:[2,2]},
+ ]},options:{responsive:true,maintainAspectRatio:false,animation:false,devicePixelRatio:1.5,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10},color:'#8E8E93'},grid:{color:'rgba(0,0,0,.04)'}},y:{ticks:{font:{size:10},color:'#8E8E93'},grid:{color:'rgba(0,0,0,.04)'}}}}});
+}
+function updateChart(){
+ if(!S.chart)return;
+ const tp=document.getElementById('sub-timeline');if(tp&&!tp.classList.contains('active'))return;
+ const labels=TL_MINS.map((_,i)=>slotTime(i));
+ S.chart.data.labels=labels;
+ S.chart.data.datasets[0].data=TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].sbp)||null);
+ S.chart.data.datasets[1].data=TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].pulse)||null);
+ S.chart.data.datasets[2].data=TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].spo2)||null);
+ S.chart.data.datasets[3].data=TL_MINS.map((_,i)=>parseFloat(S.vitals[i]&&S.vitals[i].pain)||null);
+ S.chart.data.datasets[4].data=TL_MINS.map((_,i)=>aldreteComplete(i)?aldreteScore(i):null);
+ S.chart.update();
+}
+
+/* ══ SCORES ══ */
+function buildScores(crit,scores,fid,tid,sid,bid){
+ const c=document.getElementById(fid);c.innerHTML='';
+ crit.forEach(cr=>{
+  const item=document.createElement('div');item.className='crit-item';
+  item.innerHTML='<div class="crit-lbl">'+cr.label+(cr.autoKey&&S.bSBP?'<span class="auto-tag">Auto BP</span>':'')+'</div><div class="crit-opts" id="'+fid+'_'+cr.key+'"></div>';
+  c.appendChild(item);const opts=item.querySelector('.crit-opts');
+  cr.opts.forEach(o=>{
+   const lbl=document.createElement('label');lbl.className='crit-opt'+(scores[cr.key]===o.v?' sel':'');
+   lbl.innerHTML='<input type="radio" name="'+fid+'_'+cr.key+'" value="'+o.v+'" '+(scores[cr.key]===o.v?'checked':'')+'><div class="radio-ring"></div><span>'+o.l+'</span>';
+   if(cr.autoKey&&S.bSBP){lbl.style.opacity='.5';lbl.style.pointerEvents='none';}
+   lbl.querySelector('input').addEventListener('change',()=>{
+    scores[cr.key]=o.v;opts.querySelectorAll('.crit-opt').forEach(b=>b.classList.remove('sel'));lbl.classList.add('sel');
+    recalc(scores,tid,sid,bid);updateStatus();updateSummary();buildAlerts();updateChart();
+   });
+   opts.appendChild(lbl);
+  });
+ });recalc(scores,tid,sid,bid);
+}
+function recalc(sc,tid,sid,bid){
+ const vals=Object.values(sc).filter(v=>typeof v==='number');
+ const complete=vals.length>0;
+ const t=vals.reduce((a,b)=>a+b,0);const pct=t/10*100;
+ const te=document.getElementById(tid),fill=document.getElementById(bid),st=document.getElementById(sid);
+ if(!te)return;
+ te.textContent=complete?t:'—';
+ const cls=!complete?'':pct>=90?'good':pct>=70?'warn':'danger';
+ if(cls){te.className='score-total '+cls;fill.className='score-fill '+cls;fill.style.width=pct+'%';
+  st.className='score-status-lbl '+cls;st.textContent=pct>=90?'พร้อมจำหน่าย':pct>=70?'เฝ้าระวัง — ใกล้เกณฑ์':'ยังไม่พร้อม';}
+ else{te.className='score-total';fill.style.width='0%';st.textContent='ยังไม่ได้ประเมิน';}
+}
+const getA=()=>Object.values(S.aS).reduce((a,b)=>a+b,0);
+const getP=()=>Object.values(S.pS).filter(v=>typeof v==='number').reduce((a,b)=>a+b,0);
+/* use latest timepoint score for display */
+function getLatestAldrete(){
+ var i=lastCompleteAldrete();
+ if(i>=0)return aldreteScore(i);
+ return 0;
+}
+
+/* ══ STATUS ══ */
+function updateStatus(){
+ const a=getLatestAldrete(),p=getP(),isO=S.type==='OPD';
+ document.getElementById('combinedScore').textContent=isO?a+p:a;
+ document.getElementById('ssA').textContent=a;document.getElementById('ssP').textContent=p;
+ const card=document.getElementById('statusCard');
+ const ready=isO?(a>=9&&p>=9):(a>=9);const obs=isO?(a>=7&&p>=7):(a>=7&&a<9);
+ if(ready){card.className='status-strip ready';document.getElementById('sBadge').textContent='🟢 พร้อม ('+(isO?'OPD':'IPD')+')';document.getElementById('sTitle').textContent='ผู้ป่วยพร้อมจำหน่าย';document.getElementById('sDesc').textContent=isO?'Aldrete และ PADSS อยู่ในเกณฑ์':'Aldrete Score อยู่ในเกณฑ์';}
+ else if(obs){card.className='status-strip observe';document.getElementById('sBadge').textContent='🟡 เฝ้าดู';document.getElementById('sTitle').textContent='ต้องเฝ้าระวังต่อ';document.getElementById('sDesc').textContent='Aldrete: '+a+'/10'+(isO?' · PADSS: '+p+'/10':'');}
+ else{card.className='status-strip alert';document.getElementById('sBadge').textContent='🔴 แจ้งเตือน';document.getElementById('sTitle').textContent='ผู้ป่วยยังไม่พร้อม';document.getElementById('sDesc').textContent='Aldrete: '+a+'/10'+(isO?' · PADSS: '+p+'/10':'');}
+}
+
+/* ══ ALERTS ══ */
+function buildAlerts(){
+ const list=document.getElementById('alertList');list.innerHTML='';
+ const a=getLatestAldrete(),p=getP(),lv=S.vitals.filter(Boolean).slice(-1)[0]||{};
+ const al=[];
+ if(a<7)al.push({l:'danger',i:'🔴',t:'Aldrete ต่ำมาก',x:'Aldrete '+a+'/10 — ต้องประเมินและแทรกแซงด่วน (ASA Standards)'});
+ else if(a<9)al.push({l:'warn',i:'🟡',t:'Aldrete ใกล้เกณฑ์',x:'Aldrete '+a+'/10 — ติดตามต่อ เฝ้าระวัง'});
+ if(S.type==='OPD'){if(p<7)al.push({l:'danger',i:'🔴',t:'PADSS ต่ำ',x:'PADSS '+p+'/10 — ห้ามจำหน่าย (Chung FF. J Clin Anesth 1995)'});else if(p<9)al.push({l:'warn',i:'🟡',t:'PADSS ใกล้เกณฑ์',x:'PADSS '+p+'/10 — ยังไม่พร้อมกลับบ้าน'});}
+ if(lv.sbp&&S.bSBP){const pct=Math.abs(parseFloat(lv.sbp)-S.bSBP)/S.bSBP*100;if(pct>=40)al.push({l:'danger',i:'🔴',t:'BP เบี่ยงเบน '+pct.toFixed(0)+'% จาก baseline',x:'🔴 รายงานวิสัญญีแพทย์ทันที — ระวัง Hypovolemia/Vasodilation (ASA/WFSA)'});else if(pct>=20)al.push({l:'warn',i:'🟡',t:'BP เบี่ยงเบน '+pct.toFixed(0)+'% จาก baseline',x:'วัดซ้ำใน 5 นาที จัดท่า ปรับ IV rate — เฝ้าระวัง'});}
+ if(lv.pulse){const h=parseFloat(lv.pulse);if(h<50||h>120)al.push({l:'danger',i:'🔴',t:'HR '+h+' bpm — ผิดปกติ',x:'🔴 รายงานวิสัญญีแพทย์ทันที — พิจารณา ACLS (ACC/AHA/HRS 2018)'});else if(h<60||h>100)al.push({l:'warn',i:'🟡',t:'HR '+h+' bpm',x:'ประเมินสาเหตุ (pain/hypovolemia/drug)'});}
+ if(lv.spo2){const s=parseFloat(lv.spo2);if(s<90)al.push({l:'danger',i:'🔴',t:'SpO₂ '+s+'% — วิกฤต',x:'🔴 รายงานวิสัญญีแพทย์ทันที — เตรียม Airway management'});else if(s<95)al.push({l:'warn',i:'🟡',t:'SpO₂ '+s+'%',x:'เพิ่ม O₂ flow จัดท่า airway ให้ deep breathing'});}
+ if(lv.rr){const r=parseFloat(lv.rr);if(r<10||r>25)al.push({l:'danger',i:'🔴',t:'RR '+r+' ครั้ง/นาที — ผิดปกติ',x:'🔴 รายงานวิสัญญีแพทย์ทันที — ระวัง CO₂ retention/Respiratory depression'});else if(r<12||r>20)al.push({l:'warn',i:'🟡',t:'RR '+r+' ครั้ง/นาที',x:'กระตุ้นหายใจ เฝ้าระวัง'});}
+ if(lv.temp){const t=parseFloat(lv.temp);if(t>38.5)al.push({l:'danger',i:'🔴',t:'Temp '+t+'°C — ไข้สูง',x:'🔴 รายงานวิสัญญีแพทย์ — ระวัง Malignant Hyperthermia (MH) / Infection'});else if(t<36)al.push({l:'warn',i:'🟡',t:'Temp '+t+'°C — Hypothermia',x:'Warming blanket เพิ่ม IV fluid อุ่น (RCAT Perioperative Hypothermia Guideline)'});}
+ if(lv.pain){const pn=parseFloat(lv.pain);if(pn>=7)al.push({l:'danger',i:'🔴',t:'Pain '+pn+'/10 — ปวดรุนแรง',x:'🔴 รายงานวิสัญญีแพทย์ — Multimodal analgesia (PROSPECT/RCAT 2020)'});else if(pn>=4)al.push({l:'warn',i:'🟡',t:'Pain '+pn+'/10',x:'พิจารณายาแก้ปวด PRN ตาม order'});}
+ const tech=document.getElementById('anesthTech').value;
+ if(lv.pulse&&parseFloat(lv.pulse)<55&&tech.includes('GA'))al.push({l:'warn',i:'⚠️',t:'Bradycardia หลัง Laparoscopy (HR<55)',x:'อาจเกิดจาก CO₂ peritoneal stretch → Vagal reflex — HR<50 → รายงานด่วน (Korean J Anesth 2013; Circulation 2017)'});
+ // PONV risk
+ const isLap=S.opType==='lap';
+ if(isLap&&S.type==='OPD')al.push({l:'info',i:'ℹ️',t:'PONV Risk สูง (Lap GYN + OPD)',x:'ให้ prophylaxis ≥2 กลไก: Dexamethasone 4–8 mg + Ondansetron 4 mg ตาม RCAT 2564/ESAIC 2020'});
+ // Ondansetron QT alert
+ const hasOndan=S.drugs.some(d=>d.name==='Ondansetron');
+ if(hasOndan)al.push({l:'warn',i:'⚠️',t:'Ondansetron — ตรวจ QTc',x:'Ondansetron ยืด QT — ตรวจ QTc ก่อน/หลังให้ หลีกเลี่ยงถ้า QTc>500ms หรือมียา QT-prolonging อื่น (RCAT 2564)'});
+ al.forEach(a2=>{const d=document.createElement('div');d.className='alert-chip '+a2.l;d.innerHTML='<div class="alert-ico">'+a2.i+'</div><div class="alert-body"><div class="alert-title">'+a2.t+'</div><div class="alert-action">'+a2.x+'</div></div>';list.appendChild(d);});
+}
+
+/* ══ SUMMARY ══ */
+function updateSummary(){
+ const a=getLatestAldrete(),p=getP(),lv=S.vitals.filter(Boolean).slice(-1)[0]||{};
+ const sa=document.getElementById('sumA'),sp=document.getElementById('sumP');
+ if(sa){sa.textContent=a+'/10';sa.className='sum-box-val '+(a>=9?'good':a>=7?'warn':'danger');}
+ if(sp){sp.textContent=p+'/10';sp.className='sum-box-val '+(p>=9?'good':p>=7?'warn':'danger');}
+ document.getElementById('summaryPanel').innerHTML=[
+  {k:'ความดันโลหิต',v:lv.sbp?(lv.sbp+'/'+(lv.dbp||'?')+' mmHg'):'—',c:''},
+  {k:'ชีพจร',v:lv.pulse?(lv.pulse+' bpm'):'—',c:''},
+  {k:'SpO₂',v:lv.spo2?(lv.spo2+'%'):'—',c:parseFloat(lv.spo2)<93?'danger':parseFloat(lv.spo2)<95?'warn':'good'},
+  {k:'อุณหภูมิ',v:lv.temp?(lv.temp+'°C'):'—',c:parseFloat(lv.temp)<36?'warn':parseFloat(lv.temp)>38.5?'danger':''},
+  {k:'ความปวด',v:lv.pain!=null?(lv.pain+'/10'):'—',c:parseFloat(lv.pain)>=7?'danger':parseFloat(lv.pain)>=4?'warn':'good'},
+  {k:'สถานะรวม',v:a>=9&&(S.type==='IPD'||p>=9)?'พร้อม':a>=7?'เฝ้าดู':'แจ้งเตือน',c:a>=9&&(S.type==='IPD'||p>=9)?'good':a>=7?'warn':'danger'},
+ ].map(i=>'<div class="sum-row"><span class="sum-key">'+i.k+'</span><span class="sum-val '+i.c+'">'+i.v+'</span></div>').join('');
+}
+
+/* ══ DRUGS ══ */
+function addDrug(){S.drugs.push({name:'Morphine',dose:'',unit:'mg',time:nt()});renderDrugs();}
+function renderDrugs(){
+ const c=document.getElementById('drugList');c.innerHTML='';
+ S.drugs.forEach((d,i)=>{
+  const el=document.createElement('div');el.className='drug-entry';
+  el.innerHTML='<div class="drug-hdr"><select class="drug-select" onchange="S.drugs['+i+'].name=this.value;renderDrugs();buildAlerts();">'+DRUG_LIST.map(n=>'<option'+(d.name===n?' selected':'')+'>'+n+'</option>').join('')+'</select><button type="button" class="drug-del" onclick="S.drugs.splice('+i+',1);renderDrugs();buildAlerts();">ลบ</button></div>'
+   +'<div class="drug-body"><div class="drug-field"><label>Dose</label><input type="number" value="'+d.dose+'" oninput="S.drugs['+i+'].dose=this.value;" placeholder="0"></div>'
+   +'<div class="drug-field"><label>Unit</label><input type="text" value="'+d.unit+'" oninput="S.drugs['+i+'].unit=this.value;" placeholder="mg"></div>'
+   +'<div class="drug-field" style="grid-column:1/-1;border-bottom:none;"><label>เวลาที่ให้</label><input type="time" value="'+d.time+'" oninput="S.drugs['+i+'].time=this.value;"></div></div>';
+  c.appendChild(el);
+ });buildDrugMon();
+}
+function addFluid(){S.fluids.push({name:'NSS (0.9% NaCl)',volume:'',remain:'',time:nt()});renderFluids();}
+function renderFluids(){
+ const c=document.getElementById('fluidList');if(!c)return;c.innerHTML='';
+ S.fluids.forEach(function(fl,i){
+  const el=document.createElement('div');el.className='drug-entry';
+  el.innerHTML='<div class="drug-hdr"><select class="drug-select" onchange="S.fluids['+i+'].name=this.value;renderFluids();">'+FLUID_LIST.map(function(n){return '<option'+(fl.name===n?' selected':'')+'>'+n+'</option>';}).join('')+'</select><button type="button" class="drug-del" onclick="S.fluids.splice('+i+',1);renderFluids();">ลบ</button></div>'
+   +'<div class="drug-body"><div class="drug-field"><label>ปริมาณที่ให้ (ml)</label><input type="number" value="'+fl.volume+'" oninput="S.fluids['+i+'].volume=this.value;" placeholder="0"></div>'
+   +'<div class="drug-field"><label>เหลือมา (ml)</label><input type="number" value="'+fl.remain+'" oninput="S.fluids['+i+'].remain=this.value;" placeholder="0"></div>'
+   +'<div class="drug-field" style="grid-column:1/-1;border-bottom:none;"><label>เวลา</label><input type="time" value="'+fl.time+'" oninput="S.fluids['+i+'].time=this.value;"></div></div>';
+  c.appendChild(el);
+ });
+}
+function buildDrugMon(){
+ if(!S.drugs.length){document.getElementById('drugMonBox').style.display='none';return;}
+ document.getElementById('drugMonBox').style.display='block';
+ const ml=document.getElementById('drugMonList');ml.innerHTML='';
+ let minIv=30;const seen=new Set();
+ S.drugs.forEach(d=>{const pr=DPROT[d.name];if(!pr)return;minIv=Math.min(minIv,pr.iv);pr.items.forEach(it=>{if(seen.has(it))return;seen.add(it);const el=document.createElement('div');el.className='drug-monitor-item';el.innerHTML='<div class="drug-dot"></div><div style="font-size:12px;color:var(--text-2);line-height:1.4;">'+it+'</div>';ml.appendChild(el);});});
+ if(S.drugs.length>1){const el=document.createElement('div');el.className='drug-monitor-item';el.innerHTML='<div class="drug-dot" style="background:var(--red);"></div><div style="font-size:12px;font-weight:600;color:var(--text);">📌 ยาหลายตัว: Monitor ทุก <span style="color:var(--red);">'+minIv+' นาที</span></div>';ml.prepend(el);}
+}
+
+/* ══ NOTES ══ */
+function addNote(){
+ const d=document.createElement('div');d.className='note-entry';
+ d.innerHTML='<div class="note-hdr"><input type="time" class="note-time" name="noteTime" value="'+nt()+'"><button type="button" class="note-del" onclick="this.closest(&quot;.note-entry&quot;).remove()">×</button></div>'
+  +'<div class="note-field" style="border-top:.5px solid var(--sep)"><label>การพยาบาล</label><input type="text" name="nursingCare" placeholder="บันทึกการพยาบาล..."></div>'
+  +'<div class="note-field"><label>ยา / สารน้ำ</label><input type="text" name="medication" placeholder="ยาหรือสารน้ำ..."></div>'
+  +'<div class="note-field"><label>การรักษา</label><input type="text" name="treatment" placeholder="การรักษา..."></div>'
+  +'<div class="note-field"><label>พยาบาล</label><input type="text" name="nurseName" placeholder="ชื่อพยาบาล"></div>';
+ document.getElementById('notesList').appendChild(d);
+}
+
+/* ══ TIMER ══ */
+function startTimer(){
+ const inp=document.querySelector('[name="timeArrival"]');if(!inp||!inp.value)return;
+ const[ah,am]=inp.value.split(':').map(Number);
+ const base=new Date();base.setHours(ah,am,0,0);S.arr=base;
+ if(S.tI)clearInterval(S.tI);if(S.cI)clearInterval(S.cI);
+ const tick=()=>{const diff=Math.round((new Date()-base)/60000);if(diff<0)return;const h=Math.floor(diff/60),m=diff%60;const el=document.getElementById('pacuTimer');el.textContent=(h>0?h+'h '+m+'m':m+'m');el.className='timer-pill'+(diff>120?' lng':diff>60?' mid':'');};
+ const tickC=()=>{const el2=Math.round((new Date()-base)/60000);const nx=TL_MINS.find(t=>t>el2);if(!nx){document.getElementById('nextWrap').style.display='none';return;}document.getElementById('nextWrap').style.display='flex';document.getElementById('nextCd').textContent=(nx-el2)+' นาที';refreshNowCol();updateChart();};
+ tick();tickC();S.tI=setInterval(tick,30000);S.cI=setInterval(tickC,60000);
+}
+
+/* ══ COMPLICATION + EKG PANELS ══ */
+function buildCompPanel(){
+ const cl=document.getElementById('compList');cl.innerHTML='';
+ COMPLICATIONS.forEach(c=>{const d=document.createElement('div');d.className='comp-row';d.innerHTML='<div class="comp-icon">'+c.icon+'</div><div class="comp-body"><div class="comp-title">'+c.title+'</div><div class="comp-signs" style="color:var(--text-3);">สัญญาณ: '+c.signs+'</div><div class="comp-action">▶ '+c.action+'</div></div>';cl.appendChild(d);});
+ const ep=document.getElementById('ekgPatterns');ep.innerHTML='';
+ EKG_PATTERNS.forEach(g=>{
+  const cls={immediate:'ekg-immediate',urgent:'ekg-urgent',routine:'ekg-routine'}[g.level];
+  let html='<div class="'+cls+'"><div class="ekg-level-tag">'+g.label+'</div>';
+  g.items.forEach(it=>{html+='<div style="margin-top:6px;padding-top:6px;border-top:.5px solid rgba(0,0,0,.06);"><div class="ekg-finding">'+it.p+'</div><div class="ekg-action">'+it.a+'</div></div>';});
+  html+='</div>';ep.innerHTML+=html;
+ });
+}
+
+/* ══ PATIENTS ══ */
+function statusClass(st){
+ // map Thai status text -> g/y/r
+ if(!st)return 'y';
+ if(st.indexOf('\u0e1e\u0e23\u0e49\u0e2d\u0e21')>=0||st==='ready')return 'g';
+ if(st.indexOf('\u0e41\u0e08\u0e49\u0e07')>=0||st.indexOf('\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48')>=0||st==='alert')return 'r';
+ return 'y';
+}
+function bedAlerts(p){
+ // return array of {level,msg} for a patient based on vitals + scores
+ var out=[];
+ var a=Number(p.aldrete||0),sp=Number(p.spo2||0),hr=Number(p.pulse||0),rr=Number(p.rr||0),pain=Number(p.pain||0);
+ if(sp&&sp<92)out.push({level:'r',msg:'SpO\u2082 '+sp+'% (<92%)'});
+ if(a&&a<7)out.push({level:'r',msg:'Aldrete '+a+' (<7)'});
+ if(hr&&(hr<50||hr>120))out.push({level:'r',msg:'HR '+hr});
+ if(rr&&(rr<10||rr>30))out.push({level:'r',msg:'RR '+rr});
+ if(pain&&pain>6)out.push({level:'r',msg:'Pain '+pain+'/10'});
+ if(p.patientType==='OPD'&&Number(p.padss)&&Number(p.padss)<7)out.push({level:'r',msg:'PADSS '+p.padss+' (<7)'});
+ if(!out.length){
+  if(sp&&sp<95)out.push({level:'y',msg:'SpO\u2082 '+sp+'%'});
+  if(a&&a<9)out.push({level:'y',msg:'Aldrete '+a});
+  if(pain&&pain>=4)out.push({level:'y',msg:'Pain '+pain+'/10'});
+ }
+ return out;
+}
+function bedLevel(p){
+ var al=bedAlerts(p);
+ if(al.some(function(x){return x.level==='r';}))return 'r';
+ if(al.length)return 'y';
+ return 'g';
+}
+
+function loadCommandCenter(){
+ if(typeof google!=='undefined'&&google.script&&google.script.run){
+  google.script.run.withSuccessHandler(function(list){S.patients=list||[];renderCommandCenter();})
+   .withFailureHandler(function(){S.patients=S.patients||[];renderCommandCenter();})
+   .getActivePatients();
+ }else{
+  // standalone demo data
+  if(!S.patients||!S.patients.length){
+   S.patients=[
+    {recordId:'D1',bed:'1',patientName:'\u0e2a\u0e21\u0e0a\u0e32\u0e22 \u0e43\u0e08\u0e14\u0e35',hn:'HN001234',operation:'Lap hysterectomy',anesthesia:'Spinal',patientType:'OPD',timeArrival:'08:30',sbp:120,dbp:78,pulse:72,rr:16,spo2:99,temp:36.5,pain:2,aldrete:10,padss:9,status:'\u0e1e\u0e23\u0e49\u0e2d\u0e21'},
+    {recordId:'D2',bed:'2',patientName:'\u0e27\u0e34\u0e44\u0e25 \u0e23\u0e31\u0e01\u0e29\u0e32\u0e14\u0e35',hn:'HN001235',operation:'Open laparotomy',anesthesia:'GA',patientType:'IPD',timeArrival:'09:15',sbp:124,dbp:80,pulse:84,rr:18,spo2:96,temp:36.8,pain:3,aldrete:8,padss:7,status:'\u0e40\u0e1d\u0e49\u0e32\u0e23\u0e30\u0e27\u0e31\u0e07'},
+    {recordId:'D3',bed:'3',patientName:'\u0e1b\u0e23\u0e30\u0e2a\u0e32\u0e19 \u0e21\u0e31\u0e48\u0e19\u0e04\u0e07',hn:'HN001236',operation:'ORIF femur',anesthesia:'GA',patientType:'IPD',timeArrival:'10:00',sbp:100,dbp:60,pulse:122,rr:22,spo2:88,temp:37,pain:5,aldrete:6,padss:5,status:'\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e1e\u0e23\u0e49\u0e2d\u0e21'},
+    {recordId:'D4',bed:'4',patientName:'\u0e19\u0e38\u0e0a\u0e19\u0e32\u0e0e \u0e2a\u0e27\u0e23\u0e23\u0e04\u0e4c',hn:'HN001237',operation:'Lap chole',anesthesia:'GA',patientType:'OPD',timeArrival:'10:45',sbp:118,dbp:76,pulse:70,rr:16,spo2:98,temp:36.6,pain:1,aldrete:9,padss:10,status:'\u0e1e\u0e23\u0e49\u0e2d\u0e21'}
+   ];
+  }
+  renderCommandCenter();
+ }
+}
+
+function bedCardHTML(p){
+ var lv=bedLevel(p);
+ var statLbl={g:'\u0e04\u0e07\u0e17\u0e35\u0e48',y:'\u0e40\u0e1d\u0e49\u0e32\u0e23\u0e30\u0e27\u0e31\u0e07',r:'\u0e41\u0e08\u0e49\u0e07\u0e41\u0e1e\u0e17\u0e22\u0e4c'}[lv];
+ var al=bedAlerts(p);
+ var chips='';
+ chips+='<span class="bed-chip '+(Number(p.spo2)<95?'bad':'ok')+'">SpO\u2082 '+(p.spo2||'-')+'</span>';
+ chips+='<span class="bed-chip">HR '+(p.pulse||'-')+'</span>';
+ chips+='<span class="bed-chip '+(Number(p.aldrete)>=9?'ok':Number(p.aldrete)<7?'bad':'')+'">Aldrete '+(p.aldrete||'-')+'</span>';
+ var why=lv==='r'?'<div class="bed-why"><span>\u26a0\ufe0f</span><span>'+al.filter(function(x){return x.level==='r';}).map(function(x){return x.msg;}).join(' \u00b7 ')+' \u2014 \u0e41\u0e08\u0e49\u0e07\u0e27\u0e34\u0e2a\u0e31\u0e0d\u0e0d\u0e35\u0e41\u0e1e\u0e17\u0e22\u0e4c</span></div>':'';
+ return '<div class="bed-card '+lv+'" data-rec="'+(p.recordId||'')+'"><div class="bed-inner">'
+  +'<div class="bed-top"><span class="bed-id">\ud83d\udecf\ufe0f \u0e40\u0e15\u0e35\u0e22\u0e07 '+(p.bed||'-')+'</span><span class="bed-stat '+lv+'">'+statLbl+'</span></div>'
+  +'<div class="bed-name">'+(p.patientName||'-')+' \u00b7 '+(p.hn||'')+'</div>'
+  +'<div class="bed-op">'+(p.operation||'')+' \u00b7 '+(p.anesthesia||'')+' \u00b7 '+(p.patientType||'')+'</div>'
+  +'<div class="bed-chips">'+chips+'<span class="bed-chip timer">\u23f1 '+(p.timeArrival||'')+'</span></div>'
+  +why+'</div></div>';
+}
+
+function renderCommandCenter(){
+ var pts=S.patients||[];
+ var att=document.getElementById('ccAttention'),stb=document.getElementById('ccStable'),emp=document.getElementById('ccEmpty');
+ if(!pts.length){if(att)att.innerHTML='';if(stb)stb.innerHTML='';if(emp)emp.style.display='block';updateCCMetrics();return;}
+ if(emp)emp.style.display='none';
+ var attention=pts.filter(function(p){return bedLevel(p)!=='g';});
+ var stable=pts.filter(function(p){return bedLevel(p)==='g';});
+ // sort attention: red first
+ attention.sort(function(a,b){return (bedLevel(b)==='r'?1:0)-(bedLevel(a)==='r'?1:0);});
+ att.innerHTML=attention.length?('<div class="cc-sec">\ud83d\udd34 \u0e15\u0e49\u0e2d\u0e07\u0e2a\u0e19\u0e43\u0e08\u0e15\u0e2d\u0e19\u0e19\u0e35\u0e49</div>'+attention.map(bedCardHTML).join('')):'';
+ stb.innerHTML=stable.length?('<div class="cc-sec">\ud83d\udfe2 \u0e04\u0e07\u0e17\u0e35\u0e48</div>'+stable.map(bedCardHTML).join('')):'';
+ // wire clicks
+ document.querySelectorAll('.bed-card').forEach(function(c){
+  c.addEventListener('click',function(){openPatient(c.dataset.rec);});
+ });
+ updateCCMetrics();
+ renderAlertsCenter();
+ renderReports();
+}
+function updateCCMetrics(){
+ var pts=S.patients||[];
+ var stable=pts.filter(function(p){return bedLevel(p)==='g';}).length;
+ var att=pts.filter(function(p){return bedLevel(p)==='y';}).length;
+ var crit=pts.filter(function(p){return bedLevel(p)==='r';}).length;
+ var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+ set('mToday',pts.length);set('mReady',stable);set('mObserve',att);set('mAlert',crit);
+ set('rpTotal',pts.length);set('rpStable',stable);set('rpReassess',att);set('rpReview',crit);
+ var dot=document.getElementById('navAlertDot');if(dot)dot.style.display=crit>0?'block':'none';
+}
+var intakeType='IPD';
+function setIntakeType(t){intakeType=t;document.getElementById('itIPD').classList.toggle('on',t==='IPD');document.getElementById('itOPD').classList.toggle('on',t==='OPD');}
+function openIntake(){
+ // reset intake fields + sensible defaults
+ setIntakeType('IPD');
+ var today=new Date().toISOString().slice(0,10);
+ var di=document.getElementById('itDate');if(di)di.value=today;
+ var ai=document.getElementById('itArrival');if(ai)ai.value=nt();
+ ['itBed','itName','itHN','itSBP','itDBP','itOp','itSurgeon','itAnes','itFrom'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+ var tt=document.getElementById('itTech');if(tt)tt.selectedIndex=0;
+ openModal('intakeModal');
+}
+function submitIntake(){
+ var name=document.getElementById('itName').value.trim();
+ var bed=document.getElementById('itBed').value.trim();
+ if(!bed){toast('กรุณากรอกหมายเลขเตียง','err');return;}
+ if(!name){toast('กรุณากรอกชื่อผู้ป่วย','err');return;}
+ // reset record state for a fresh patient
+ document.getElementById('pacuForm').reset();
+ S.vitals=[];S.drugs=[];S.fluids=[];
+ S.aldretePerTP=[];S.assess=[];for(var i=0;i<6;i++){S.aldretePerTP.push({});S.assess.push({});}
+ S.aS={};S.pS={};
+ S.bSBP=parseFloat(document.getElementById('itSBP').value)||null;
+ S.bDBP=parseFloat(document.getElementById('itDBP').value)||null;
+ S.currentRecordId='R'+Date.now();
+ // copy intake values into the record form
+ var set=function(n,v){var el=document.querySelector('[name="'+n+'"]');if(el)el.value=v;};
+ set('date',document.getElementById('itDate').value);
+ set('timeArrival',document.getElementById('itArrival').value);
+ set('bed',bed);set('hn',document.getElementById('itHN').value);
+ set('patientName',name);
+ set('baselineSBP',document.getElementById('itSBP').value);
+ set('baselineDBP',document.getElementById('itDBP').value);
+ set('operation',document.getElementById('itOp').value);
+ set('surgeon',document.getElementById('itSurgeon').value);
+ set('anesthesiologist',document.getElementById('itAnes').value);
+ set('anesthesiaTechnique',document.getElementById('itTech').value);
+ set('receivedFrom',document.getElementById('itFrom').value);
+ // apply type (shows/hides PADSS) + build everything
+ setType(intakeType);
+ onAnesthChange();
+ buildTimeline();renderDrugs();renderFluids();
+ buildScores(PADSS,S.pS,'padssFields','padssTotal','padssStatus','padssFill');
+ updateStatus();updateSummary();buildAlerts();startTimer();
+ closeModal('intakeModal');
+ switchTab('record');switchSub('info');
+}
+function openPatient(rec){
+ // open the detail/record page; (loading existing record from Sheets optional)
+ S.currentRecordId=rec||null;
+ switchTab('record');
+}
+
+function renderAlertsCenter(){
+ var pts=S.patients||[];var box=document.getElementById('alertsCenter'),emp=document.getElementById('alertsEmpty');
+ if(!box)return;
+ var groups=[];
+ pts.forEach(function(p){var al=bedAlerts(p);if(al.length)groups.push({p:p,al:al});});
+ // sort: patients with red first
+ groups.sort(function(x,y){var xr=x.al.some(function(a){return a.level==='r';})?1:0;var yr=y.al.some(function(a){return a.level==='r';})?1:0;return yr-xr;});
+ if(!groups.length){box.innerHTML='';if(emp)emp.style.display='block';return;}
+ if(emp)emp.style.display='none';
+ box.innerHTML=groups.map(function(g){
+  return '<div class="alert-pt-group"><div class="alert-pt-hdr">\ud83d\udecf\ufe0f \u0e40\u0e15\u0e35\u0e22\u0e07 '+(g.p.bed||'-')+' \u00b7 '+(g.p.patientName||'')+'</div>'
+   +g.al.map(function(a){return '<div class="alert-chip '+(a.level==='r'?'danger':'warn')+'"><div class="alert-ico">'+(a.level==='r'?'\ud83d\udd34':'\ud83d\udfe1')+'</div><div class="alert-body"><div class="alert-title">'+a.msg+'</div><div class="alert-action">'+(a.level==='r'?'\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e27\u0e34\u0e2a\u0e31\u0e0d\u0e0d\u0e35\u0e41\u0e1e\u0e17\u0e22\u0e4c':'\u0e40\u0e1d\u0e49\u0e32\u0e23\u0e30\u0e27\u0e31\u0e07 \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e0b\u0e49\u0e33')+'</div></div></div>';}).join('')
+   +'</div>';
+ }).join('');
+}
+
+function renderReports(){
+ var pts=S.patients||[];
+ var rm=document.getElementById('reportMetrics');
+ if(rm){
+  var painInc=pts.filter(function(p){return Number(p.pain)>=4;}).length;
+  var avgStay='\u2014';
+  rm.innerHTML=[
+   ['\u0e1c\u0e39\u0e49\u0e1b\u0e48\u0e27\u0e22\u0e43\u0e19\u0e2b\u0e49\u0e2d\u0e07\u0e1e\u0e31\u0e01\u0e1f\u0e37\u0e49\u0e19',pts.length+' \u0e23\u0e32\u0e22'],
+   ['\u0e21\u0e35\u0e2d\u0e32\u0e01\u0e32\u0e23\u0e1b\u0e27\u0e14 (Pain\u22654)',painInc+' \u0e23\u0e32\u0e22'],
+   ['\u0e15\u0e49\u0e2d\u0e07\u0e41\u0e08\u0e49\u0e07\u0e41\u0e1e\u0e17\u0e22\u0e4c',pts.filter(function(p){return bedLevel(p)==='r';}).length+' \u0e23\u0e32\u0e22']
+  ].map(function(r){return '<div class="sum-row"><span class="sum-key">'+r[0]+'</span><span class="sum-val">'+r[1]+'</span></div>';}).join('');
+ }
+ var rr=document.getElementById('reportRoster');
+ if(rr){
+  rr.innerHTML=pts.length?pts.map(function(p){var lv=bedLevel(p);var c=lv==='g'?'good':lv==='y'?'warn':'danger';return '<div class="sum-row"><span class="sum-key">\u0e40\u0e15\u0e35\u0e22\u0e07 '+(p.bed||'-')+' \u00b7 '+(p.patientName||'')+'</span><span class="sum-val '+c+'">Aldrete '+(p.aldrete||'-')+'</span></div>';}).join(''):'<div class="sum-row"><span class="sum-key" style="color:var(--text-3);">\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25</span></div>';
+ }
+}
+
+
+/* ══ TOAST ══ */
+const toast=(msg,type)=>{type=type||'ok';const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+type;setTimeout(()=>t.classList.remove('show'),3000);};
+
+/* ══ PRINT ══ */
+function preparePrint(){
+ const fd=new FormData(document.getElementById('pacuForm'));const a=getLatestAldrete(),p=getP();
+ const ready=a>=9&&(S.type==='IPD'||p>=9),obs=a>=7&&(S.type==='IPD'||p>=7);
+ document.getElementById('p-status-badge').innerHTML='<span class="p-badge '+(ready?'ready':obs?'observe':'alert')+'">'+(ready?'🟢 พร้อมจำหน่าย':obs?'🟡 เฝ้าระวัง':'🔴 ยังไม่พร้อม')+'</span>';
+ document.getElementById('p-pt').innerHTML=[['วันที่',fd.get('date')],['HN',fd.get('hn')],['ชื่อ',fd.get('patientName')],['Baseline SBP/DBP',(fd.get('baselineSBP')||'—')+'/'+(fd.get('baselineDBP')||'—')+' mmHg'],['เวลาแรกรับ',fd.get('timeArrival')],['ประเภท',S.type]].map(r=>'<div class="p-kv"><span class="p-k">'+r[0]+'</span><span class="p-v">'+(r[1]||'—')+'</span></div>').join('');
+ document.getElementById('p-op').innerHTML=[['การผ่าตัด',fd.get('operation')],['ประเภทผ่าตัด',S.opType==='lap'?'Laparoscopic/MIS':'Open laparotomy'],['ศัลยแพทย์',fd.get('surgeon')],['วิสัญญีแพทย์',fd.get('anesthesiologist')],['วิธีระงับ',fd.get('anesthesiaTechnique')],['รับจาก',fd.get('receivedFrom')]].map(r=>'<div class="p-kv"><span class="p-k">'+r[0]+'</span><span class="p-v">'+(r[1]||'—')+'</span></div>').join('');
+ document.getElementById('p-tl').innerHTML='<tr><th>เวลา</th><th>SBP</th><th>DBP</th><th>HR</th><th>RR</th><th>SpO₂</th><th>Temp</th><th>Pain</th><th>Aldrete</th></tr>'
+  +TL_MINS.map((m,i)=>{const v=S.vitals[i]||{};const ald=aldreteScore(i);return'<tr><td class="lbl">'+slotTime(i)+'</td><td>'+(v.sbp||'—')+'</td><td>'+(v.dbp||'—')+'</td><td>'+(v.pulse||'—')+'</td><td>'+(v.rr||'—')+'</td><td>'+(v.spo2||'—')+'</td><td>'+(v.temp||'—')+'</td><td>'+(v.pain||'—')+'</td><td>'+(v.sbp?ald:'—')+'</td></tr>';}).join('');
+ document.getElementById('p-ald').innerHTML='<div class="p-kv"><span class="p-k">คะแนน Aldrete (ล่าสุด)</span><span class="p-v '+(a>=9?'ok':a>=7?'warn':'danger')+'">'+a+'/10 — '+(a>=9?'พร้อม':a>=7?'เฝ้าระวัง':'ยังไม่พร้อม')+'</span></div>';
+ document.getElementById('p-padss-sec').style.display=S.type==='OPD'?'block':'none';
+ document.getElementById('p-padss').innerHTML='<div class="p-kv"><span class="p-k">คะแนน PADSS</span><span class="p-v '+(p>=9?'ok':p>=7?'warn':'danger')+'">'+p+'/10</span></div>';
+ var pf=document.getElementById('p-fluids');if(pf)pf.innerHTML=S.fluids.length?S.fluids.map(function(fl){return '<div class="p-kv"><span class="p-k">'+fl.name+'</span><span class="p-v">'+(fl.volume||'-')+' ml'+(fl.remain?(' (เหลือ '+fl.remain+' ml)'):'')+(fl.time?(' '+fl.time):'')+'</span></div>';}).join(''):'<div class="p-kv"><span class="p-k" style="color:#999;">ไม่ได้บันทึกสารน้ำ</span></div>';
+ document.getElementById('p-drugs').innerHTML=S.drugs.length?S.drugs.map(d=>'<div class="p-kv"><span class="p-k">'+d.name+'</span><span class="p-v">'+d.dose+' '+d.unit+' เวลา '+d.time+'</span></div>').join(''):'<div class="p-kv"><span class="p-k" style="color:#999;">ไม่ได้บันทึกยา</span></div>';
+ const checks=['dressingDry','shivering','nausea','vomiting','agitation','urinaryRetention','shoulderPain','bloating'];
+ const cL={dressingDry:'แผลแห้ง',shivering:'หนาวสั่น',nausea:'คลื่นไส้',vomiting:'อาเจียน',agitation:'กระสับกระส่าย',urinaryRetention:'ปัสสาวะไม่ออก',shoulderPain:'ปวดไหล่',bloating:'ท้องอืด'};
+ const fAt=function(k){var times=[];TL_MINS.forEach(function(_,i){if(S.assess[i]&&S.assess[i][k])times.push(slotTime(i));});return times;};
+ const found=checks.filter(function(k){return fAt(k).length;});
+ document.getElementById('p-assess').innerHTML=found.length?found.map(function(k){return '<div class="p-kv"><span class="p-k">⚠️ '+cL[k]+'</span><span class="p-v warn">'+fAt(k).join(', ')+'</span></div>';}).join(''):'<div class="p-kv"><span class="p-k">ไม่พบความผิดปกติ</span></div>';
+ document.getElementById('p-dc').innerHTML=[['เวลาจำหน่าย',fd.get('timeDischarge')],['พยาบาล',fd.get('dischargeNurse')],['ส่งไปยัง',fd.get('dischargeDestination')]].map(r=>'<div class="p-kv"><span class="p-k">'+r[0]+'</span><span class="p-v">'+(r[1]||'—')+'</span></div>').join('');
+}
+
+/* ══ AI — เรียก GAS server ผ่าน google.script.run ══ */
+let scV=null;
+document.getElementById('scanFileInput').addEventListener('change',async function(){
+ const file=this.files[0];if(!file)return;
+ document.getElementById('scanPreview').src=URL.createObjectURL(file);document.getElementById('scanPreview').style.display='block';
+ const res=document.getElementById('scanResult'),th=document.getElementById('scanThinking'),out=document.getElementById('scanOutput');
+ res.classList.add('show');th.style.display='flex';out.innerHTML='';scV=null;
+ const b64=await fileToBase64(file);
+ google.script.run.withSuccessHandler(v=>{th.style.display='none';scV=v;
+  const conf={high:'🟢 มั่นใจสูง',medium:'🟡 ปานกลาง',low:'🔴 ต่ำ'}[v.confidence]||'';
+  const items=[{k:'SBP',v:v.sbp,u:'mmHg',key:'sbp'},{k:'DBP',v:v.dbp,u:'mmHg',key:'dbp'},{k:'HR',v:v.pulse,u:'bpm',key:'pulse'},{k:'SpO₂',v:v.spo2,u:'%',key:'spo2'}].filter(i=>i.v);
+  out.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><span style="font-size:13px;font-weight:600;">ผลการวิเคราะห์</span><span style="font-size:11px;color:var(--text-3);">'+conf+'</span></div><div class="vr-grid">'+items.map(i=>'<div class="vr-box '+vCls(i.key,i.v)+'"><div class="vr-key">'+i.k+'</div><div class="vr-val">'+i.v+'<span class="vr-unit"> '+i.u+'</span></div></div>').join('')+'</div><button class="apply-btn" onclick="applyScV()">✅ นำค่าเข้า Timeline</button><div class="ai-note">⚠️ ตรวจสอบความถูกต้องก่อนบันทึก</div>';
+ }).withFailureHandler(e=>{th.style.display='none';out.innerHTML='<div class="ai-note">❌ วิเคราะห์ไม่สำเร็จ: '+(e.message||e)+'</div>';}).analyzeVitals(b64,file.type);
+});
+function applyScV(){
+ if(!scV)return;
+ const el2=S.arr?Math.round((new Date()-S.arr)/60000):0;
+ const slot=TL_MINS.findIndex(t=>el2<t);const i=Math.max(0,slot<0?TL_MINS.length-1:slot===0?0:slot-1);
+ if(!S.vitals[i])S.vitals[i]={};Object.assign(S.vitals[i],scV);
+ autoCirc(i);buildTimeline();updateChart();buildAlerts();closeModal('scanModal');toast('✅ นำค่าเข้า Timeline แล้ว');
+}
+document.getElementById('ekgFileInput').addEventListener('change',async function(){
+ const file=this.files[0];if(!file)return;
+ document.getElementById('ekgPreview').src=URL.createObjectURL(file);document.getElementById('ekgPreview').style.display='block';
+ const res=document.getElementById('ekgResult'),th=document.getElementById('ekgThinking'),out=document.getElementById('ekgOutput');
+ res.classList.add('show');th.style.display='flex';out.innerHTML='';
+ const im={ok:'✅',warn:'⚠️',bad:'🔴'};
+ const b64=await fileToBase64(file);
+ google.script.run.withSuccessHandler(ekg=>{th.style.display='none';
+  const cls={normal:'normal',warning:'warning',abnormal:'abnormal'}[ekg.status]||'normal';
+  const lvl={normal:'🟢 ROUTINE',warning:'🟡 URGENT',abnormal:'🔴 IMMEDIATE'}[ekg.status]||'';
+  out.innerHTML='<span class="ekg-rhythm-badge '+cls+'">'+ekg.rhythm+'</span><div style="font-size:11px;font-weight:700;margin:8px 0 4px;color:var(--text-3);">ระดับความเร่งด่วน: '+lvl+'</div>'+(ekg.findings||[]).map(f=>'<div class="ekg-finding-row"><div class="finding-ico '+f.type+'">'+(im[f.type]||'•')+'</div><div style="font-size:12px;color:var(--text-2);">'+f.text+'</div></div>').join('')+'<div class="ai-note" style="margin-top:10px;">⚠️ ผลวิเคราะห์ใช้ประกอบการตัดสินใจทางคลินิกเท่านั้น — ไม่แทนการวินิจฉัยของแพทย์</div>';
+ }).withFailureHandler(e=>{th.style.display='none';out.innerHTML='<div class="ai-note">❌ วิเคราะห์ไม่สำเร็จ: '+(e.message||e)+'</div>';}).analyzeEKG(b64,file.type);
+});
+
+function collectPayload(){
+ const fd=new FormData(document.getElementById('pacuForm'));
+ const obj={};fd.forEach((v,k)=>{obj[k]=v;});
+ obj.patientType=S.type;
+ obj.recordId=S.currentRecordId||null;
+ obj.bed=obj.bed||'';
+ obj.opType=S.opType;
+ obj.baselineSBP=S.bSBP;obj.baselineDBP=S.bDBP;
+ obj.vitals=S.vitals;
+ obj.aldretePerTimepoint=S.aldretePerTP.map((a,i)=>({timepoint:slotTime(i),score:aldreteScore(i),detail:a}));
+ obj.aldreteLatest=getLatestAldrete();
+ obj.padss=getP();
+ obj.drugs=S.drugs;
+ obj.fluids=S.fluids;
+ obj.assessPerTimepoint=S.assess.map(function(a,i){return {timepoint:slotTime(i),flags:a};});
+ obj.timestamp=new Date().toISOString();
+ return obj;
+}
+function saveRecord(){
+ const msg=document.getElementById('saveState');msg.textContent='กำลังบันทึก...';msg.className='save-msg';
+ google.script.run.withSuccessHandler((res)=>{if(res&&res.recordId)S.currentRecordId=res.recordId;msg.textContent='✓ บันทึกสำเร็จ';msg.className='save-msg ok';toast('✓ บันทึกสำเร็จ');loadCommandCenter();setTimeout(()=>{switchTab('overview');},1200);}).withFailureHandler(e=>{msg.textContent='✗ ล้มเหลว: '+(e.message||e);msg.className='save-msg err';toast('✗ บันทึกล้มเหลว','err');}).savePacuRecord(collectPayload());
+}
+
+/* ══ INIT ══ */
+document.addEventListener('DOMContentLoaded',()=>{
+ const dateEl=document.querySelector('[name="date"]');if(dateEl)dateEl.value=new Date().toISOString().slice(0,10);
+ const arrEl=document.getElementById('arrivalInput');
+ if(arrEl){arrEl.value=nt();arrEl.addEventListener('change',startTimer);}
+ // เริ่มต้นด้วยตารางว่าง — ให้พยาบาลกรอกเอง
+ buildTimeline();
+ buildScores(PADSS,S.pS,'padssFields','padssTotal','padssStatus','padssFill');
+ addNote();setType('IPD');buildCompPanel();
+ updateStatus();updateSummary();buildAlerts();startTimer();loadCommandCenter();
+ var gt=document.getElementById('gridTable');
+ gt.addEventListener('input',function(e){
+  var inp=e.target.closest('input');if(!inp||!inp.dataset.vk)return;
+  onTlI(parseInt(inp.dataset.tp),inp.dataset.vk,inp);
+ });
+ gt.addEventListener('change',function(e){
+  var sel=e.target.closest('select');if(!sel)return;
+  if(sel.dataset.key){setAldrete(parseInt(sel.dataset.tp),sel.dataset.key,sel.value===''?NaN:parseInt(sel.value));}
+  else if(sel.dataset.vk==='ekg'){var i=parseInt(sel.dataset.tp);if(!S.vitals[i])S.vitals[i]={};S.vitals[i].ekg=sel.value;sel.classList.toggle('empty',!sel.value);buildAlerts();}
+ });
+ document.getElementById('assessTable').addEventListener('click',function(e){
+  var btn=e.target.closest('button');if(!btn||!btn.dataset.ak)return;
+  setAssess(parseInt(btn.dataset.tp),btn.dataset.ak);
+ });
+ document.getElementById('addNoteBtn').addEventListener('click',addNote);
+ document.getElementById('addDrugBtn').addEventListener('click',addDrug);
+ var afb=document.getElementById('addFluidBtn');if(afb)afb.addEventListener('click',addFluid);
+ document.getElementById('openScanModal').addEventListener('click',()=>{switchSub('timeline');openModal('scanModal');});
+ document.getElementById('openEkgModal').addEventListener('click',()=>openModal('ekgModal'));
+ var ek2=document.getElementById('openEkgModal2');if(ek2)ek2.addEventListener('click',()=>openModal('ekgModal'));
+ document.getElementById('saveBtn').addEventListener('click',saveRecord);
+ document.getElementById('exportBtn').addEventListener('click',()=>{preparePrint();window.print();});
+ document.getElementById('dischargeBtn').addEventListener('click',()=>{
+  const d=document.querySelector('[name="timeDischarge"]');if(!d.value)d.value=nt();updateSummary();toast('บันทึกเวลาจำหน่ายแล้ว');
+ });
+ document.getElementById('addPatientBtn').addEventListener('click',openIntake);
+ document.getElementById('intakeGo').addEventListener('click',submitIntake);
+});
+</script>
+
+
+</body>
+</html>
